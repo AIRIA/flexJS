@@ -60,6 +60,7 @@
 			}
 			this.stageWidth = canvas.width;
 			this.stageHeight = canvas.height;
+			Flex.app.context = this.context;
 		},
 		setStageSize:function(w,h){
 			this.stageWidth = this.canvas.width = w;

@@ -3,7 +3,9 @@
  *
  */
 (function(window) {
-	var Flex = window.Flex = window.$f = {};
+	var Flex = window.Flex = window.$f = {
+		app:window
+	};
 	Flex.extend = function(sub, sup) {
 		sub.superClass = sup.__proto__;
 		for(prop in sup) {
