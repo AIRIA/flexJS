@@ -4,11 +4,31 @@
 		this._frameRate = 24;
 		this.context = null;
 		this.canvas = null;
-		this.stageWidth = 0;
-		this.stageHeight = 0;
+		this._stageWidth = 0;
+		this._stageHeight = 0;
 		this.state = "start";
 		this.renderId = null;
 		Object.defineProperties(this, {
+			stageWidth:{
+				get:function(){
+					return this._stageWidth;
+				},
+				set:function(value){
+					if(this._stageWidth!=value){
+						this._stageWidth = value;
+					}
+				}
+			},
+			stageHeight:{
+				get:function(){
+					return this._stageHeight;
+				},
+				set:function(value){
+					if(this._stageHeight!=value){
+						this._stageHeight = value;
+					}
+				}
+			},
 			frameRate : {
 				get : function() {
 					return this._frameRate;
@@ -42,8 +62,8 @@
 			this.stageHeight = canvas.height;
 		},
 		setStageSize:function(w,h){
-			this.canvas.width = w;
-			this.canvas.height = h;
+			this.stageWidth = this.canvas.width = w;
+			this.stageHeight = this.canvas.height = h;
 			this.canvas.style.marginLeft= (-w/2)+"px";
 		},
 		start : function() {
