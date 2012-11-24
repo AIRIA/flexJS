@@ -76,7 +76,7 @@
 			this.state = "stop";
 		},
 		appRender : function(self) {
-			self.context.clearRect(0, 0, this.stageWidth, this.stageHeight);
+			self.context.clearRect(0, 0, self.stageWidth, self.stageHeight);
 			self.render(self);
 
 		},
