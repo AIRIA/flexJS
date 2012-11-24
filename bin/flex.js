@@ -69,13 +69,19 @@
 			this._strokeSetted = false;
 		},
 		drawRect:function(x,y,width,height){
-			this._steps.push({prop:'fillRect',value:[this.owner.stageX + x,this.owner.stageY + y,width,height]});
+			var drawX = this.owner.stageX + x;
+			var drawY = this.owner.stageY + y;
+			this.measureSize(x,y,width,height);
+			this._steps.push({prop:'fillRect',value:[drawX,drawY,width,height]});
 			return this;
 		},
 		drawCircle:function(x,y,radius){
 			var steps = this._steps;
+			var drawX = this.owner.stageX + x;
+			var drawY = this.owner.stageY + y;
+			this.measureSize(x,y,radius,radius);
 			steps.push({prop:'beginPath',value:[]});
-			steps.push({prop:'arc',value:[this.owner.stageX + x, this.owner.stageY + y, radius, 0, Math.PI * 2, false]});
+			steps.push({prop:'arc',value:[drawX,drawY, radius, 0, Math.PI * 2, false]});
 			if(this._fillSetted){
 				steps.push({prop:'fill',value:[]});
 			}
@@ -86,6 +92,11 @@
 		},
 		endFill:function(){
 			context.restore();
+		},
+		measureSize:function(x,y,width,height){
+			var owner = this.owner;
+			owner.measureWidth = Math.max(owner.measureWidth,x+width);
+			owner.measureHeight = Math.max(owner.measureHeight,y+height);
 		},
 		render:function(){
 			var currentStep;
@@ -109,6 +120,16 @@
 
 //---------------------------------------------------
 (function() {
+	/**
+	 * x y width height stageX stageY 这些属性对于定位非常重要
+	 * stageX的值等于所在容器的stageX值加上自己的X属性 在绘制的时候 是以stageX stageY为坐标为起点开始绘制的 
+	 * 为了达到自适应的效果 关于坐标和尺寸的数值都会统一和一个比例相乘 
+	 * 这个比例是在stage初始化的时候获取到的值 获取到之后存放到window全局作用域中
+	 * stageX stageY 都是在添加到容器的时候进行设置的
+	 * width height是在render之前进行设置
+	 * measureWidth measureHeight 是实际测量的大小
+	 * 
+	 */
 	Flex.DisplayObject = function(config) {
 		Flex.extend(this, new Flex.EventDispatcher());
 		config = config || {};
@@ -116,6 +137,8 @@
 		this._y = config.y || 0;
 		this._width = NaN;
 		this._height = NaN;
+		this.measureWidth = 0;
+		this.measureHeight = 0;
 		this.stageX = 0;
 		this.stageY = 0;
 		this.visibal = true;
@@ -189,6 +212,7 @@
 		}
 	}
 })();
+
 
 //---------------------------------------------------
 (function() {

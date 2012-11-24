@@ -29,25 +29,43 @@
 			this._strokeSetted = false;
 		},
 		drawRect:function(x,y,width,height){
-			this._steps.push({prop:'fillRect',value:[this.owner.stageX + x,this.owner.stageY + y,width,height]});
+			var drawX = this.owner.stageX + x;
+			var drawY = this.owner.stageY + y;
+			this.measureSize(x,y,width,height);
+			this._steps.push({prop:'fillRect',value:[drawX,drawY,width,height]});
 			return this;
 		},
 		drawCircle:function(x,y,radius){
 			var steps = this._steps;
+			var drawX = this.owner.stageX + x;
+			var drawY = this.owner.stageY + y;
+			this.measureSize(x,y,radius,radius);
 			steps.push({prop:'beginPath',value:[]});
-			steps.push({prop:'arc',value:[this.owner.stageX + x, this.owner.stageY + y, radius, 0, Math.PI * 2, false]});
+			steps.push({prop:'arc',value:[drawX,drawY, radius, 0, Math.PI * 2, false]});
 			if(this._fillSetted){
 				steps.push({prop:'fill',value:[]});
 			}
 			if(this._strokeSetted){
 				steps.push({prop:'stroke',value:[]});
 			}
-			steps.push({prop:'closePath',value:[]});
 			return this;
 		},
 		endFill:function(){
 			context.restore();
 		},
+		/**
+		 * 在调用drawXXX方法的时候 进行调用 来更新measureWidth measureHeight的值
+		 * @TODO 在clear的时候应该更新此方法  
+		 * 
+		 */
+		measureSize:function(x,y,width,height){
+			var owner = this.owner;
+			owner.measureWidth = Math.max(owner.measureWidth,x+width);
+			owner.measureHeight = Math.max(owner.measureHeight,y+height);
+		},
+		/**
+		 * 在owner的render方法中调用本方法来执行steps中保存的步骤
+		 */
 		render:function(){
 			var currentStep;
 			var steps = this._steps;
