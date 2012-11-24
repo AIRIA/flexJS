@@ -122,13 +122,13 @@
 (function() {
 	/**
 	 * x y width height stageX stageY 这些属性对于定位非常重要
-	 * stageX的值等于所在容器的stageX值加上自己的X属性 在绘制的时候 是以stageX stageY为坐标为起点开始绘制的 
-	 * 为了达到自适应的效果 关于坐标和尺寸的数值都会统一和一个比例相乘 
+	 * stageX的值等于所在容器的stageX值加上自己的X属性 在绘制的时候 是以stageX stageY为坐标为起点开始绘制的
+	 * 为了达到自适应的效果 关于坐标和尺寸的数值都会统一和一个比例相乘
 	 * 这个比例是在stage初始化的时候获取到的值 获取到之后存放到window全局作用域中
 	 * stageX stageY 都是在添加到容器的时候进行设置的
 	 * width height是在render之前进行设置
 	 * measureWidth measureHeight 是实际测量的大小
-	 * 
+	 *
 	 */
 	Flex.DisplayObject = function(config) {
 		Flex.extend(this, new Flex.EventDispatcher());
@@ -147,68 +147,53 @@
 		this.enable = true;
 		this.parent = null;
 		this.mask = null;
-		Object.defineProperties(this, {
-			x : {
-				configurable:true,
-				enumerable:true,
-				get : function() {
-					return this._x;
-				},
-				set : function(value) {
-					if(this._x != value) {
-						this._x = value;
-					}
-				}
-			},
-			y : {
-				configurable:true,
-				enumerable:true,
-				get : function() {
-					return this._y;
-				},
-				set : function(value) {
-					if(this._y != value) {
-						this._y = value;
-					}
-				}
-			},
-			width : {
-				configurable:true,
-				enumerable:true,
-				get : function() {
-					return this._width;
-				},
-				set : function(value) {
-					if(this._width!=value){
-						this._width = value;
-					}
-				}
-			},
-			height : {
-				configurable:true,
-				enumerable:true,
-				get : function() {
-					return this._height;
-				},
-				set : function(value) {
-					if(this._height!=value){
-						this._height = value;
-					}
-				}
-			}
-		});
 	}
-	
+
 	Flex.DisplayObject.prototype = {
-		constructor:Flex.DisplayObject,
-		getRect:function(){
+		constructor : Flex.DisplayObject,
+		getRect : function() {
 			//TODO
-		},getBounds:function(){
+		},
+		getBounds : function() {
 			//TODO
-		},globalToLocal:function(){
+		},
+		globalToLocal : function() {
 			//TODO
-		},localToGlobal:function(){
-			
+		},
+		localToGlobal : function() {
+
+		},
+		getX : function() {
+			return this._x;
+		},
+		setX : function(value) {
+			if(this._x != value) {
+				this._x = value;
+			}
+		},
+		getY : function() {
+			return this._y;
+		},
+		setY : function(value) {
+			if(this._y != value) {
+				this._y = value;
+			}
+		},
+		getWidth : function() {
+			return this._width;
+		},
+		setWidth : function(value) {
+			if(this._width != value) {
+				this._width = value;
+			}
+		},
+		getHeight : function() {
+			return this._height;
+		},
+		setHeight : function(value) {
+			if(this._height != value) {
+				this._height = value;
+			}
 		}
 	}
 })();
@@ -219,24 +204,15 @@
 	Flex.DisplayObjectContainer = function(config) {
 		Flex.extend(this, new Flex.DisplayObject(config));
 		this._children = [];
-		Object.defineProperties(this, {
-			children : {
-				configurable : true,
-				enumerable : true,
-				get : function() {
-					return this._children;
-				}
-			}
-		});
 	}
 
 	Flex.DisplayObjectContainer.prototype = {
 		constructor : Flex.DisplayObjectContainer,
 		numChildren : function() {
-			return this.children.length;
+			return this._children.length;
 		},
 		addChild : function(child) {
-			var children = this.children;
+			var children = this._children;
 			if(children.indexOf(child) == -1) {
 				children.push(child);
 			} else {
@@ -250,7 +226,7 @@
 			for(var i = 0; i < children.length; i++) {
 				child = children[i]
 				if( child instanceof DisplayObject) {
-					this.children.push(child);
+					this._children.push(child);
 					child.parent = this;
 				} else {
 					trace(child + "不是DisplayObject的实例", Flex.Const.Log.ERROR);
@@ -259,28 +235,28 @@
 			return children;
 		},
 		addChildAt : function(child, index) {
-			this.children.splice(index - 1, 0, child);
+			this._children.splice(index - 1, 0, child);
 			child.parent = this;
 			return child;
 		},
 		contains : function(child) {
-			if(this.children.indexOf(child) == -1) {
+			if(this._children.indexOf(child) == -1) {
 				return false;
 			}
 			return true;
 		},
 		getChildren : function() {
-			return this.children;
+			return this._children;
 		},
 		getChildAt : function(index) {
-			if(this.children.length - 1 < index) {
+			if(this._children.length - 1 < index) {
 				trace(this + "索引越界异常");
 				return;
 			}
-			return this.children[index];
+			return this._children[index];
 		},
 		getChildIndex : function(child) {
-			var index = this.children.indexOf(child);
+			var index = this._children.indexOf(child);
 			if(index == -1) {
 				trace(this + "中不存在" + child + "显示对象")
 				return;
@@ -288,19 +264,19 @@
 			return index;
 		},
 		removeChild : function(child) {
-			this.children.splice(this.getChildAt(child), 1);
+			this._children.splice(this.getChildAt(child), 1);
 			return child;
 		},
 		removeChildAt : function(index) {
 			var child = this.getChildAt(index);
-			this.children.splice(index, 1);
+			this._children.splice(index, 1);
 			return child;
 		},
 		setChildIndex : function(child, index) {
 			//TODO
 		},
 		swapChildren : function(child1, child2) {
-			var childList = this.children;
+			var childList = this._children;
 			var ind1 = childList.indexOf(child1);
 			var ind2 = childList.indexOf(child2);
 			if(ind1 == -1 || ind2 == -1) {
@@ -518,23 +494,14 @@
 (function(){
 	Flex.Sprite = function(config){
 		Flex.extend(this,new Flex.DisplayObjectContainer(config));
-		this._graphics = null;
-		Object.defineProperties(this,{
-			graphics:{
-				configurable:true,
-				enumerable:true,
-				get:function(){
-					if(!this._graphics){
-						this._graphics = new Flex.Graphics(this);
-					}
-					return this._graphics;
-				}
-			}
-		});
+		this.graphics = new Flex.Graphics(this);
 	} 
 	
-	Flex.Sprite.prototype.render = function(){
-		this.graphics.render();
+	Flex.Sprite.prototype = {
+		constructor:Flex.Sprite,
+		render:function(){
+			this.graphics.render();
+		}
 	}
 	
 })();
