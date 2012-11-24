@@ -11,10 +11,11 @@
 		beginFill:function(color){
 			this._fillSetted = true;
 			context.save();
-			context.fillStyle = color;
+			this._steps.push({prop:"fillStyle",value:color});
 			return this;
 		},
-		lineStyle:function(weight,color,lineGap){
+		lineStyle:function(weight,color,lineCap){
+			context.save();
 			this._strokeSetted = true;
 			var steps = this._steps;
 			steps.push({prop:"strokeStyle",value:color});
@@ -41,6 +42,7 @@
 			if(this._strokeSetted){
 				steps.push({prop:'stroke',value:[]});
 			}
+			steps.push({prop:'closePath',value:[]});
 			return this;
 		},
 		endFill:function(){
@@ -57,7 +59,7 @@
 				if(prop instanceof Function){
 					prop.apply(context,val);
 				}else{
-					prop = currentStep.value;
+					context[currentStep.prop] = currentStep.value;
 				}
 			}
 		}
