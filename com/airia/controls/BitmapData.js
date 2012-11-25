@@ -19,12 +19,11 @@
 				},
 				set:function(value){
 					if(this._src!=value){
+						if(this._src){
+							this.content = null;
+						}
 						this._src = value;
 						var assets = this.assets,content = this.content,self = this;
-						if(!assets){
-							assets = new Assets();
-							assets.src = value;
-						}
 						if(!content){
 							content = new Image();
 							content.src = value;

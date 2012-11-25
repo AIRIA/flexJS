@@ -705,11 +705,7 @@
 	 */
 	Flex.Bitmap = function(bmd, rect) {
 		Flex.extend(this, new Flex.DisplayObject());
-		if(bmd) {
-			this.bitmapData = bmd;
-		} else {
-			throw new Error("Bitmap的bitmapData参数不能为空");
-		}
+		this._bitmapData = null;
 		if(rect) {
 			this.width = rect.w;
 			this.height = rect.h;
@@ -726,8 +722,38 @@
 						this.height = value.h;
 					}
 				}
+			},
+			/**
+			 * 在此处对 BitmapData进行优化 一旦bitmapData的引用长度为0的话 就立刻进行回收
+			 */
+			bitmapData:{
+				get:function(){
+					return this._bitmapData;
+				},
+				set:function(value){
+					if(this._bitmapData!=value){
+						var bmd = this._bitmapData;
+						//如果bmd不为空的话 就把bmd的引用减1 以便正确的统计引用次数
+						if(bmd){
+							bmd.used--;
+							if(bmd.used==0){
+								//释放bitmapdata的资源
+								bmd.dispose();
+							}
+						}
+						this._bitmapData = value;
+						trace(this._bitmapData);
+						this._bitmapData.used += 1;
+						
+					}
+				}
 			}
 		});
+		if(bmd) {
+			this.bitmapData = bmd;
+		} else {
+			throw new Error("Bitmap的bitmapData参数不能为空");
+		}
 
 	}
 	/**
@@ -755,7 +781,6 @@
 		}
 	}
 })();
-
 //---------------------------------------------
 (function(){
 
