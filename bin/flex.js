@@ -630,10 +630,150 @@
 
 })();
 //---------------------------------------------
+(function(){
+	/**
+	 * BitmapData 都是和Bitmap结合使用 
+	 * 所以在Bitmap中为bitmapData属性赋值的时候 
+	 * 可以对实例的used属性进行增减操作
+	 */
+	Flex.BitmapData = function(src,rect){
+		this.assets = null;
+		this.loaded = false;
+		//被引用次数
+		this.used = 0;
+		//Image类型的实例
+		this.content = null;
+		this._src = null;
+		Object.defineProperties(this,{
+			src:{
+				get:function(){
+					return this._src;
+				},
+				set:function(value){
+					if(this._src!=value){
+						this._src = value;
+						var assets = this.assets,content = this.content,self = this;
+						if(!assets){
+							assets = new Assets();
+							assets.src = value;
+						}
+						if(!content){
+							content = new Image();
+							content.src = value;
+							content.onload = function(){
+								self.loaded = true;
+								self.x = this.x;
+								self.y = this.y;
+								self.width = this.width
+								self.height = this.height;
+								self.content = content;
+							}
+						}
+					}
+				}
+			}
+		});
+		this.src = src;
+	}
+	
+	/**
+	 * 释放资源 
+	 */
+	Flex.BitmapData.prototype.dispose = function(){
+		this.used = 0;
+		this.loaded = false;
+		this.content = null;
+		this.assets = null;
+	}
+	
+	Flex.BitmapData.prototype.getRect = function(){
+		return {
+			x:this.x,
+			y:this.y,
+			w:this.width,
+			h:this.height
+		};
+	}
+	
+})();
 
 //---------------------------------------------
+(function() {
+	/**
+	 * Bitmap 类表示用于表示位图图像的显示对象
+	 * @extends Flex.DisplayObject
+	 */
+	Flex.Bitmap = function(bmd, rect) {
+		Flex.extend(this, new Flex.DisplayObject());
+		if(bmd) {
+			this.bitmapData = bmd;
+		} else {
+			throw new Error("Bitmap的bitmapData参数不能为空");
+		}
+		if(rect) {
+			this.width = rect.w;
+			this.height = rect.h;
+		}
+		Object.defineProperties(this, {
+			rect : {
+				get : function() {
+					return this._rect;
+				},
+				set : function(value) {
+					if(this._rect != value) {
+						this._rect = value;
+						this.width = value.w;
+						this.height = value.h;
+					}
+				}
+			}
+		});
+
+	}
+	/**
+	 * 每一帧的渲染逻辑
+	 */
+	Flex.Bitmap.prototype.render = function() {
+		var bmd = this.bitmapData;
+		var rect = this.rect;
+		if(!rect) {
+			rect = bmd.getRect();
+		}
+		if(bmd.loaded) {
+			var width, height;
+			if(this.width) {
+				width = this.width;
+			} else {
+				this.width = width = rect.w;
+			}
+			if(this.height) {
+				height = this.height;
+			} else {
+				this.height = height = rect.h;
+			}
+			context.drawImage(bmd.content, rect.x, rect.y, rect.w, rect.h, this.stageX, this.stageY, width, height);
+		}
+	}
+})();
 
 //---------------------------------------------
+(function(){
+
+	/**
+	 * 资源modal 包括两个属性 一个是src 一个是被引用次数 used
+	 */
+	Flex.app.Assets = function(){
+		this.src = null;
+		this.used = 0;
+	};
+	/**
+	 * 资源管理类
+	 * cachedAssets中存放Assets对象实例
+	 */
+	Flex.app.AssetsManager = {
+		cachedAssets:[],
+	};
+})();
 
 //---------------------------------------------
 
