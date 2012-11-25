@@ -4,8 +4,6 @@
 		this._graphics = null;
 		Object.defineProperties(this,{
 			graphics:{
-				configurable:true,
-				enumerable:true,
 				get:function(){
 					if(!this._graphics){
 						this._graphics = new Flex.Graphics(this);

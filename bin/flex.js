@@ -221,8 +221,6 @@
 		this.mask = null;
 		Object.defineProperties(this, {
 			x : {
-				configurable:true,
-				enumerable:true,
 				get : function() {
 					trace("getX");
 					return this._x;
@@ -234,8 +232,6 @@
 				}
 			},
 			y : {
-				configurable:true,
-				enumerable:true,
 				get : function() {
 					return this._y;
 				},
@@ -246,8 +242,6 @@
 				}
 			},
 			width : {
-				configurable:true,
-				enumerable:true,
 				get : function() {
 					return this._width;
 				},
@@ -258,8 +252,6 @@
 				}
 			},
 			height : {
-				configurable:true,
-				enumerable:true,
 				get : function() {
 					return this._height;
 				},
@@ -267,6 +259,16 @@
 					if(this._height!=value){
 						this._height = value;
 					}
+				}
+			},
+			explicitOrMeasureWidth : {
+				get : function() {
+					return isNaN(this.width) ? this.measureWidth : this.width;
+				}
+			},
+			explicitOrMeasureHeight : {
+				get : function() {
+					return isNaN(this.height) ? this.measureHeight : this.height;
 				}
 			}
 		});
@@ -293,10 +295,13 @@
 		this._children = [];
 		Object.defineProperties(this, {
 			children : {
-				configurable : true,
-				enumerable : true,
 				get : function() {
 					return this._children;
+				}
+			},
+			numChildren:{
+				get :function(){
+					return this.children.length;
 				}
 			}
 		});
@@ -304,13 +309,19 @@
 
 	Flex.DisplayObjectContainer.prototype = {
 		constructor : Flex.DisplayObjectContainer,
-		numChildren : function() {
-			return this.children.length;
+		/**
+		 * 在被添加到显示列表中的时候 对child的全局坐标进行校验
+		 */
+		validateCoordinate:function(child){
+			child.stageX = child.x + this.stageX;
+			child.stageY = child.y + this.stageY;
 		},
 		addChild : function(child) {
 			var children = this.children;
 			if(children.indexOf(child) == -1) {
 				children.push(child);
+				child.parent = this;
+				this.validateCoordinate(child);
 			} else {
 				trace(child + '已经存在于' + this + '的显示列表中了', Flex.Const.Log.ERROR);
 			}
@@ -324,6 +335,7 @@
 				if( child instanceof DisplayObject) {
 					this.children.push(child);
 					child.parent = this;
+					this.validateCoordinate(child);
 				} else {
 					trace(child + "不是DisplayObject的实例", Flex.Const.Log.ERROR);
 				}
@@ -333,6 +345,7 @@
 		addChildAt : function(child, index) {
 			this.children.splice(index - 1, 0, child);
 			child.parent = this;
+			this.validateCoordinate(child);
 			return child;
 		},
 		contains : function(child) {
@@ -412,8 +425,6 @@
 		this._graphics = null;
 		Object.defineProperties(this,{
 			graphics:{
-				configurable:true,
-				enumerable:true,
 				get:function(){
 					if(!this._graphics){
 						this._graphics = new Flex.Graphics(this);
@@ -519,7 +530,7 @@
 					displayObject.render();
 				}
 			}
-			var numChildren = displayObject.numChildren();
+			var numChildren = displayObject.numChildren;
 			if(numChildren) {
 				var children = displayObject.getChildren();
 				for(var i = 0; i < numChildren; i++) {

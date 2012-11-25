@@ -86,7 +86,7 @@
 					displayObject.render();
 				}
 			}
-			var numChildren = displayObject.numChildren();
+			var numChildren = displayObject.numChildren;
 			if(numChildren) {
 				var children = displayObject.getChildren();
 				for(var i = 0; i < numChildren; i++) {
