@@ -2,15 +2,24 @@
 	Flex.DisplayObjectContainer = function(config) {
 		Flex.extend(this, new Flex.DisplayObject(config));
 		this._children = [];
+		Object.defineProperties(this, {
+			children : {
+				configurable : true,
+				enumerable : true,
+				get : function() {
+					return this._children;
+				}
+			}
+		});
 	}
 
 	Flex.DisplayObjectContainer.prototype = {
 		constructor : Flex.DisplayObjectContainer,
 		numChildren : function() {
-			return this._children.length;
+			return this.children.length;
 		},
 		addChild : function(child) {
-			var children = this._children;
+			var children = this.children;
 			if(children.indexOf(child) == -1) {
 				children.push(child);
 			} else {
@@ -24,7 +33,7 @@
 			for(var i = 0; i < children.length; i++) {
 				child = children[i]
 				if( child instanceof DisplayObject) {
-					this._children.push(child);
+					this.children.push(child);
 					child.parent = this;
 				} else {
 					trace(child + "不是DisplayObject的实例", Flex.Const.Log.ERROR);
@@ -33,28 +42,28 @@
 			return children;
 		},
 		addChildAt : function(child, index) {
-			this._children.splice(index - 1, 0, child);
+			this.children.splice(index - 1, 0, child);
 			child.parent = this;
 			return child;
 		},
 		contains : function(child) {
-			if(this._children.indexOf(child) == -1) {
+			if(this.children.indexOf(child) == -1) {
 				return false;
 			}
 			return true;
 		},
 		getChildren : function() {
-			return this._children;
+			return this.children;
 		},
 		getChildAt : function(index) {
-			if(this._children.length - 1 < index) {
+			if(this.children.length - 1 < index) {
 				trace(this + "索引越界异常");
 				return;
 			}
-			return this._children[index];
+			return this.children[index];
 		},
 		getChildIndex : function(child) {
-			var index = this._children.indexOf(child);
+			var index = this.children.indexOf(child);
 			if(index == -1) {
 				trace(this + "中不存在" + child + "显示对象")
 				return;
@@ -62,19 +71,19 @@
 			return index;
 		},
 		removeChild : function(child) {
-			this._children.splice(this.getChildAt(child), 1);
+			this.children.splice(this.getChildAt(child), 1);
 			return child;
 		},
 		removeChildAt : function(index) {
 			var child = this.getChildAt(index);
-			this._children.splice(index, 1);
+			this.children.splice(index, 1);
 			return child;
 		},
 		setChildIndex : function(child, index) {
 			//TODO
 		},
 		swapChildren : function(child1, child2) {
-			var childList = this._children;
+			var childList = this.children;
 			var ind1 = childList.indexOf(child1);
 			var ind2 = childList.indexOf(child2);
 			if(ind1 == -1 || ind2 == -1) {

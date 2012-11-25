@@ -1,4 +1,4 @@
-//---------------------------------------------------
+//---------------------------------------------
 /**
  *
  *
@@ -8,8 +8,9 @@
 		app:window
 	};
 	Flex.extend = function(sub, sup) {
+		sup.constructor.call(sub);
 		sub.superClass = sup.__proto__;
-		for(prop in sup) {
+		for(prop in sup.__proto__) {
 			sub[prop] ? sub[prop] : sub[prop] = sup[prop];
 		}
 	}
@@ -37,7 +38,71 @@
 		eval(res);
 	}
 })(window);
-//---------------------------------------------------
+//---------------------------------------------
+(function() {
+	
+	/**
+	 * @class 
+	 * 
+	 */
+	Flex.EventDispatcher = function() {
+		this.events = {};
+	}
+
+	Flex.EventDispatcher.prototype = {
+		constructor : Flex.EventDispatcher,
+		addEventListener : function(type, handler, useCapture) {
+			if(!this.events[type]) {
+				this.events[type] = {
+					captureHandlers : [],
+					normalHandlers : []
+				};
+			}
+			var evt = this.events[type];
+			//捕获阶段的回调函数
+			if(useCapture) {
+				evt.captureHandlers.push(handler);
+			} else {
+				//添加到目标和冒泡阶段的回调函数
+				evt.normalHandlers.push(handler);
+			}
+		},
+		removeEventListener : function(type, handler, useCapture) {
+			var evt = this.events[type];
+			useCapture = useCapture || false;
+			if(useCapture) {
+				FlexUtil.removeElement(evt.captureHandlers, handler);
+			} else {
+				FlexUtil.removeElement(evt.normalHandlers, handler);
+			}
+		},
+		hasEventListener : function(type) {
+			if(this.events[type].lenght) {
+				return true;
+			}
+			return false;
+		},
+		dispatchEvent : function(event) {
+			event.target = this;
+			var evt = this.events[event.type];
+			if(evt) {
+				var normalHandlers = evt.normalHandlers;
+				var captureHandlers = evt.captureHandlers;
+				for(var i = 0; i < normalHandlers.length; i++) {
+					normalHandlers[i].call(this, event);
+				}
+			}
+			var parent = this.parent;
+			if(parent) {
+				parent.dispatchEvent(event);
+			} else {
+				throw new Error("normal quit");
+			}
+		}
+	}
+})();
+
+//---------------------------------------------
 (function(){
 	Flex.Graphics = function(owner){
 		this.owner = owner;
@@ -93,11 +158,19 @@
 		endFill:function(){
 			context.restore();
 		},
+		/**
+		 * 在调用drawXXX方法的时候 进行调用 来更新measureWidth measureHeight的值
+		 * @TODO 在clear的时候应该更新此方法  
+		 * 
+		 */
 		measureSize:function(x,y,width,height){
 			var owner = this.owner;
 			owner.measureWidth = Math.max(owner.measureWidth,x+width);
 			owner.measureHeight = Math.max(owner.measureHeight,y+height);
 		},
+		/**
+		 * 在owner的render方法中调用本方法来执行steps中保存的步骤
+		 */
 		render:function(){
 			var currentStep;
 			var steps = this._steps;
@@ -117,18 +190,17 @@
 	
 })();
 
-
-//---------------------------------------------------
+//---------------------------------------------
 (function() {
 	/**
 	 * x y width height stageX stageY 这些属性对于定位非常重要
-	 * stageX的值等于所在容器的stageX值加上自己的X属性 在绘制的时候 是以stageX stageY为坐标为起点开始绘制的
-	 * 为了达到自适应的效果 关于坐标和尺寸的数值都会统一和一个比例相乘
+	 * stageX的值等于所在容器的stageX值加上自己的X属性 在绘制的时候 是以stageX stageY为坐标为起点开始绘制的 
+	 * 为了达到自适应的效果 关于坐标和尺寸的数值都会统一和一个比例相乘 
 	 * 这个比例是在stage初始化的时候获取到的值 获取到之后存放到window全局作用域中
 	 * stageX stageY 都是在添加到容器的时候进行设置的
 	 * width height是在render之前进行设置
 	 * measureWidth measureHeight 是实际测量的大小
-	 *
+	 * 
 	 */
 	Flex.DisplayObject = function(config) {
 		Flex.extend(this, new Flex.EventDispatcher());
@@ -147,72 +219,96 @@
 		this.enable = true;
 		this.parent = null;
 		this.mask = null;
+		Object.defineProperties(this, {
+			x : {
+				configurable:true,
+				enumerable:true,
+				get : function() {
+					trace("getX");
+					return this._x;
+				},
+				set : function(value) {
+					if(this._x != value) {
+						this._x = value;
+					}
+				}
+			},
+			y : {
+				configurable:true,
+				enumerable:true,
+				get : function() {
+					return this._y;
+				},
+				set : function(value) {
+					if(this._y != value) {
+						this._y = value;
+					}
+				}
+			},
+			width : {
+				configurable:true,
+				enumerable:true,
+				get : function() {
+					return this._width;
+				},
+				set : function(value) {
+					if(this._width!=value){
+						this._width = value;
+					}
+				}
+			},
+			height : {
+				configurable:true,
+				enumerable:true,
+				get : function() {
+					return this._height;
+				},
+				set : function(value) {
+					if(this._height!=value){
+						this._height = value;
+					}
+				}
+			}
+		});
 	}
-
+	
 	Flex.DisplayObject.prototype = {
-		constructor : Flex.DisplayObject,
-		getRect : function() {
+		constructor:Flex.DisplayObject,
+		getRect:function(){
 			//TODO
-		},
-		getBounds : function() {
+		},getBounds:function(){
 			//TODO
-		},
-		globalToLocal : function() {
+		},globalToLocal:function(){
 			//TODO
-		},
-		localToGlobal : function() {
-
-		},
-		getX : function() {
-			return this._x;
-		},
-		setX : function(value) {
-			if(this._x != value) {
-				this._x = value;
-			}
-		},
-		getY : function() {
-			return this._y;
-		},
-		setY : function(value) {
-			if(this._y != value) {
-				this._y = value;
-			}
-		},
-		getWidth : function() {
-			return this._width;
-		},
-		setWidth : function(value) {
-			if(this._width != value) {
-				this._width = value;
-			}
-		},
-		getHeight : function() {
-			return this._height;
-		},
-		setHeight : function(value) {
-			if(this._height != value) {
-				this._height = value;
-			}
+		},localToGlobal:function(){
+			
 		}
 	}
 })();
 
-
-//---------------------------------------------------
+//---------------------------------------------
 (function() {
 	Flex.DisplayObjectContainer = function(config) {
 		Flex.extend(this, new Flex.DisplayObject(config));
 		this._children = [];
+		Object.defineProperties(this, {
+			children : {
+				configurable : true,
+				enumerable : true,
+				get : function() {
+					return this._children;
+				}
+			}
+		});
 	}
 
 	Flex.DisplayObjectContainer.prototype = {
 		constructor : Flex.DisplayObjectContainer,
 		numChildren : function() {
-			return this._children.length;
+			return this.children.length;
 		},
 		addChild : function(child) {
-			var children = this._children;
+			var children = this.children;
 			if(children.indexOf(child) == -1) {
 				children.push(child);
 			} else {
@@ -226,7 +322,7 @@
 			for(var i = 0; i < children.length; i++) {
 				child = children[i]
 				if( child instanceof DisplayObject) {
-					this._children.push(child);
+					this.children.push(child);
 					child.parent = this;
 				} else {
 					trace(child + "不是DisplayObject的实例", Flex.Const.Log.ERROR);
@@ -235,28 +331,28 @@
 			return children;
 		},
 		addChildAt : function(child, index) {
-			this._children.splice(index - 1, 0, child);
+			this.children.splice(index - 1, 0, child);
 			child.parent = this;
 			return child;
 		},
 		contains : function(child) {
-			if(this._children.indexOf(child) == -1) {
+			if(this.children.indexOf(child) == -1) {
 				return false;
 			}
 			return true;
 		},
 		getChildren : function() {
-			return this._children;
+			return this.children;
 		},
 		getChildAt : function(index) {
-			if(this._children.length - 1 < index) {
+			if(this.children.length - 1 < index) {
 				trace(this + "索引越界异常");
 				return;
 			}
-			return this._children[index];
+			return this.children[index];
 		},
 		getChildIndex : function(child) {
-			var index = this._children.indexOf(child);
+			var index = this.children.indexOf(child);
 			if(index == -1) {
 				trace(this + "中不存在" + child + "显示对象")
 				return;
@@ -264,19 +360,19 @@
 			return index;
 		},
 		removeChild : function(child) {
-			this._children.splice(this.getChildAt(child), 1);
+			this.children.splice(this.getChildAt(child), 1);
 			return child;
 		},
 		removeChildAt : function(index) {
 			var child = this.getChildAt(index);
-			this._children.splice(index, 1);
+			this.children.splice(index, 1);
 			return child;
 		},
 		setChildIndex : function(child, index) {
 			//TODO
 		},
 		swapChildren : function(child1, child2) {
-			var childList = this._children;
+			var childList = this.children;
 			var ind1 = childList.indexOf(child1);
 			var ind2 = childList.indexOf(child2);
 			if(ind1 == -1 || ind2 == -1) {
@@ -309,8 +405,32 @@
 	}
 
 })();
+//---------------------------------------------
+(function(){
+	Flex.Sprite = function(config){
+		Flex.extend(this,new Flex.DisplayObjectContainer(config));
+		this._graphics = null;
+		Object.defineProperties(this,{
+			graphics:{
+				configurable:true,
+				enumerable:true,
+				get:function(){
+					if(!this._graphics){
+						this._graphics = new Flex.Graphics(this);
+					}
+					return this._graphics;
+				}
+			}
+		});
+	} 
+	
+	Flex.Sprite.prototype.render = function(){
+		this.graphics.render();
+	}
+	
+})();
 
-//---------------------------------------------------
+//---------------------------------------------
 (function() {
 	Flex.Stage = function(canvasID) {
 		Flex.extend(this, new Flex.DisplayObjectContainer());
@@ -410,98 +530,27 @@
 	}
 
 })();
-//---------------------------------------------------
-(function() {
-	
-	/**
-	 * @class 
-	 * 
-	 */
-	Flex.EventDispatcher = function() {
-		this.events = {};
-	}
+//---------------------------------------------
 
-	Flex.EventDispatcher.prototype = {
-		constructor : Flex.EventDispatcher,
-		addEventListener : function(type, handler, useCapture) {
-			if(!this.events[type]) {
-				this.events[type] = {
-					captureHandlers : [],
-					normalHandlers : []
-				};
-			}
-			var evt = this.events[type];
-			//捕获阶段的回调函数
-			if(useCapture) {
-				evt.captureHandlers.push(handler);
-			} else {
-				//添加到目标和冒泡阶段的回调函数
-				evt.normalHandlers.push(handler);
-			}
-		},
-		removeEventListener : function(type, handler, useCapture) {
-			var evt = this.events[type];
-			useCapture = useCapture || false;
-			if(useCapture) {
-				FlexUtil.removeElement(evt.captureHandlers, handler);
-			} else {
-				FlexUtil.removeElement(evt.normalHandlers, handler);
-			}
-		},
-		hasEventListener : function(type) {
-			if(this.events[type].lenght) {
-				return true;
-			}
-			return false;
-		},
-		dispatchEvent : function(event) {
-			event.target = this;
-			var evt = this.events[event.type];
-			if(evt) {
-				var normalHandlers = evt.normalHandlers;
-				var captureHandlers = evt.captureHandlers;
-				for(var i = 0; i < normalHandlers.length; i++) {
-					normalHandlers[i].call(this, event);
-				}
-			}
-			var parent = this.parent;
-			if(parent) {
-				parent.dispatchEvent(event);
-			} else {
-				throw new Error("normal quit");
-			}
-		}
-	}
-})();
+//---------------------------------------------
 
-//---------------------------------------------------
-(function() {
+//---------------------------------------------
 
-	Flex.app.Log = {
-		ERROR : 'error',
-		WARN : 'warn',
-		INFO : 'info',
-		LOG : 'log'
-	}
-	
-	Flex.app.LineGap = {
-		
-	}
-	
-})();
+//---------------------------------------------
 
-//---------------------------------------------------
-(function(){
-	Flex.Sprite = function(config){
-		Flex.extend(this,new Flex.DisplayObjectContainer(config));
-		this.graphics = new Flex.Graphics(this);
-	} 
-	
-	Flex.Sprite.prototype = {
-		constructor:Flex.Sprite,
-		render:function(){
-			this.graphics.render();
-		}
-	}
-	
-})();
+//---------------------------------------------
+
+//---------------------------------------------
+
+//---------------------------------------------
+
+//---------------------------------------------
+
+//---------------------------------------------
+
+//---------------------------------------------
+
+//---------------------------------------------
+
+//---------------------------------------------
+

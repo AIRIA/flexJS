@@ -7,8 +7,9 @@
 		app:window
 	};
 	Flex.extend = function(sub, sup) {
+		sup.constructor.call(sub);
 		sub.superClass = sup.__proto__;
-		for(prop in sup) {
+		for(prop in sup.__proto__) {
 			sub[prop] ? sub[prop] : sub[prop] = sup[prop];
 		}
 	}
