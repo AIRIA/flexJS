@@ -93,8 +93,13 @@
 		 */
 		validateCoordinate:function(){
 			var parent = this.parent;
-			this.stageX = this.x + parent.stageX;
-			this.stageY = this.y + parent.stageY;
+			if(parent) {
+				this.stageX = this.x + parent.stageX;
+				this.stageY = this.y + parent.stageY;
+				if(this.graphics) {
+					this.graphics.validateRender();
+				}
+			}
 		},
 		getRect : function() {
 			//TODO

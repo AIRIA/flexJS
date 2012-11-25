@@ -5,7 +5,7 @@
  */
 (function(window) {
 	var Flex = window.Flex = window.$f = {
-		app:window
+		app : window
 	};
 	Flex.extend = function(sub, sup) {
 		sup.constructor.call(sub);
@@ -40,10 +40,10 @@
 })(window);
 //---------------------------------------------
 (function() {
-	
+
 	/**
-	 * @class 
-	 * 
+	 * @class
+	 *
 	 */
 	Flex.EventDispatcher = function() {
 		this.events = {};
@@ -103,8 +103,8 @@
 })();
 
 //---------------------------------------------
-(function(){
-	Flex.Graphics = function(owner){
+(function() {
+	Flex.Graphics = function(owner) {
 		this.owner = owner;
 		this._steps = [];
 		//调用actions中的方法和参数 重新组装steps的数据
@@ -112,82 +112,121 @@
 		this._fillSetted = false;
 		this._strokeSetted = false;
 	}
-	
+
 	Flex.Graphics.prototype = {
-		constructor:Flex.Graphics,
-		beginFill:function(color){
+		constructor : Flex.Graphics,
+		beginFill : function(color) {
 			this._fillSetted = true;
 			context.save();
-			this._actions.push({method:'beginFill',args:[color]});
-			this._steps.push({prop:"fillStyle",value:color});
+			this._actions.push({
+				method : 'beginFill',
+				args : [color]
+			});
+			this._steps.push({
+				prop : "fillStyle",
+				value : color
+			});
 			return this;
 		},
-		lineStyle:function(weight,color,lineCap){
+		lineStyle : function(weight, color, lineCap) {
 			context.save();
-			this._actions.push({method:'lineStyle',args:[weight,color,lineCap]});
+			this._actions.push({
+				method : 'lineStyle',
+				args : [weight, color, lineCap]
+			});
 			this._strokeSetted = true;
 			var steps = this._steps;
-			steps.push({prop:"strokeStyle",value:color});
-			steps.push({prop:'lineWidth',value:weight});
-			steps.push({prop:'lineCap',value:lineCap});
+			steps.push({
+				prop : "strokeStyle",
+				value : color
+			});
+			steps.push({
+				prop : 'lineWidth',
+				value : weight
+			});
+			steps.push({
+				prop : 'lineCap',
+				value : lineCap
+			});
 			return this;
 		},
-		clear:function(){
+		clear : function() {
 			this._steps.length = 0;
 			this._fillSetted = false;
 			this._strokeSetted = false;
 		},
-		drawRect:function(x,y,width,height){
-			this._actions.push({method:'drawRect',args:[x,y,width,height]});
+		drawRect : function(x, y, width, height) {
+			this._actions.push({
+				method : 'drawRect',
+				args : [x, y, width, height]
+			});
 			var drawX = this.owner.stageX + x;
 			var drawY = this.owner.stageY + y;
-			this.measureSize(x,y,width,height);
-			this._steps.push({prop:'fillRect',value:[drawX,drawY,width,height]});
+			this.measureSize(x, y, width, height);
+			this._steps.push({
+				prop : 'fillRect',
+				value : [drawX, drawY, width, height]
+			});
 			return this;
 		},
-		drawCircle:function(x,y,radius){
-			this._actions.push({method:'drawCircle',args:[x,y,radius]});
+		drawCircle : function(x, y, radius) {
+			this._actions.push({
+				method : 'drawCircle',
+				args : [x, y, radius]
+			});
 			var steps = this._steps;
 			var drawX = this.owner.stageX + x;
 			var drawY = this.owner.stageY + y;
-			this.measureSize(x,y,radius,radius);
-			steps.push({prop:'beginPath',value:[]});
-			steps.push({prop:'arc',value:[drawX,drawY, radius, 0, Math.PI * 2, false]});
-			if(this._fillSetted){
-				steps.push({prop:'fill',value:[]});
+			this.measureSize(x, y, radius, radius);
+			steps.push({
+				prop : 'beginPath',
+				value : []
+			});
+			steps.push({
+				prop : 'arc',
+				value : [drawX, drawY, radius, 0, Math.PI * 2, false]
+			});
+			if(this._fillSetted) {
+				steps.push({
+					prop : 'fill',
+					value : []
+				});
 			}
-			if(this._strokeSetted){
-				steps.push({prop:'stroke',value:[]});
+			if(this._strokeSetted) {
+				steps.push({
+					prop : 'stroke',
+					value : []
+				});
 			}
 			return this;
 		},
-		endFill:function(){
+		endFill : function() {
 			context.restore();
 		},
 		/**
 		 * 在调用drawXXX方法的时候 进行调用 来更新measureWidth measureHeight的值
-		 * @TODO 在clear的时候应该更新此方法  
-		 * 
+		 * @TODO 在clear的时候应该更新此方法
+		 *
 		 */
-		measureSize:function(x,y,width,height){
+		measureSize : function(x, y, width, height) {
 			var owner = this.owner;
-			owner.measureWidth = Math.max(owner.measureWidth,x+width);
-			owner.measureHeight = Math.max(owner.measureHeight,y+height);
+			owner.measureWidth = Math.max(owner.measureWidth, x + width);
+			owner.measureHeight = Math.max(owner.measureHeight, y + height);
 		},
 		/**
 		 * 在owner的render方法中调用本方法来执行steps中保存的步骤
 		 */
-		render:function(){
+		render : function() {
 			var currentStep;
 			var steps = this._steps;
 			//执行steps中保存的步骤
-			for(var i=0;i<steps.length;i++){
+			for(var i = 0; i < steps.length; i++) {
 				currentStep = steps[i];
 				var prop = context[currentStep.prop];
 				var val = currentStep.value;
-				if(prop instanceof Function){
-					prop.apply(context,val);
-				}else{
+				if( prop instanceof Function) {
+					prop.apply(context, val);
+				} else {
 					context[currentStep.prop] = currentStep.value;
 				}
 			}
@@ -195,23 +234,22 @@
 		/**
 		 * 当owner的x,y,stageX,stageY发生了变化要重新绘制
 		 */
-		validateRender:function(){
+		validateRender : function() {
 			this.clear();
 			var actions = this._actions;
 			var len = actions.length;
 			var action;
-			for(var i=0;i<len;i++){
+			for(var i = 0; i < len; i++) {
 				action = actions[i];
-				this[action.method].apply(this,action.args)
+				this[action.method].apply(this, action.args)
 			}
-			for(var i=0;i<len;i++){
+			for(var i = 0; i < len; i++) {
 				actions.shift();
 			}
 		}
 	}
-	
-})();
 
+})();
 
 //---------------------------------------------
 (function() {
@@ -307,12 +345,14 @@
 		/**
 		 * 在被添加到显示列表中的时候 对child的全局坐标进行校验
 		 */
-		validateCoordinate:function(){
+		validateCoordinate : function() {
 			var parent = this.parent;
-			this.stageX = this.x + parent.stageX;
-			this.stageY = this.y + parent.stageY;
-			if(this.graphics){
-				this.graphics.validateRender();
+			if(parent) {
+				this.stageX = this.x + parent.stageX;
+				this.stageY = this.y + parent.stageY;
+				if(this.graphics) {
+					this.graphics.validateRender();
+				}
 			}
 		},
 		getRect : function() {
@@ -341,8 +381,8 @@
 					return this._children;
 				}
 			},
-			numChildren:{
-				get :function(){
+			numChildren : {
+				get : function() {
 					return this.children.length;
 				}
 			}
@@ -436,16 +476,16 @@
 		//校验组件的各各属性
 		validateProperties : function() {
 			var parent = this.parent;
-			if(parent&&!(parent instanceof Flex.Stage)){
+			if(parent && !( parent instanceof Flex.Stage)) {
 				parent.validateProperties();
 			}
 			var children = this.getChildren();
 			var child;
-			for(var i=0;i<children.length;i++){
+			for(var i = 0; i < children.length; i++) {
 				child = children[i];
 				//设置显示对象测量大小
-				this.measureWidth = Math.max(this.measureWidth,child.x+child.measureWidth);
-				this.measureHeight = Math.max(this.measureHeight,child.y+child.measureHeight);
+				this.measureWidth = Math.max(this.measureWidth, child.x + child.measureWidth);
+				this.measureHeight = Math.max(this.measureHeight, child.y + child.measureHeight);
 				//获取明确设置的尺寸 如果没有明确设置 则获取测量大小
 				// this.width = Math.max(this.explicitOrMeasureWidth,child.x+child.explicitOrMeasureWidth);
 				// this.height = Math.max(this.explicitOrMeasureHeight,child.y+child.explicitOrMeasureHeight);
@@ -453,11 +493,11 @@
 		},
 		//检验组件的尺寸
 		validateSize : function() {
-			
+
 		},
 		//更新组件内部的显示列表
 		validateDisplayList : function() {
-				
+
 		},
 		initialize : function() {
 			this.validateProperties();
@@ -468,26 +508,25 @@
 
 })();
 //---------------------------------------------
-(function(){
-	Flex.Sprite = function(config){
-		Flex.extend(this,new Flex.DisplayObjectContainer(config));
+(function() {
+	Flex.Sprite = function(config) {
+		Flex.extend(this, new Flex.DisplayObjectContainer(config));
 		this._graphics = null;
-		Object.defineProperties(this,{
-			graphics:{
-				get:function(){
-					if(!this._graphics){
+		Object.defineProperties(this, {
+			graphics : {
+				get : function() {
+					if(!this._graphics) {
 						this._graphics = new Flex.Graphics(this);
 					}
 					return this._graphics;
 				}
 			}
 		});
-	} 
-	
-	Flex.Sprite.prototype.render = function(){
+	}
+
+	Flex.Sprite.prototype.render = function() {
 		this.graphics.render();
 	}
-	
 })();
 
 //---------------------------------------------
@@ -502,22 +541,22 @@
 		this.state = "start";
 		this.renderId = null;
 		Object.defineProperties(this, {
-			stageWidth:{
-				get:function(){
+			stageWidth : {
+				get : function() {
 					return this._stageWidth;
 				},
-				set:function(value){
-					if(this._stageWidth!=value){
+				set : function(value) {
+					if(this._stageWidth != value) {
 						this._stageWidth = value;
 					}
 				}
 			},
-			stageHeight:{
-				get:function(){
+			stageHeight : {
+				get : function() {
 					return this._stageHeight;
 				},
-				set:function(value){
-					if(this._stageHeight!=value){
+				set : function(value) {
+					if(this._stageHeight != value) {
 						this._stageHeight = value;
 					}
 				}
@@ -555,10 +594,10 @@
 			this.stageHeight = canvas.height;
 			Flex.app.context = this.context;
 		},
-		setStageSize:function(w,h){
+		setStageSize : function(w, h) {
 			this.stageWidth = this.canvas.width = w;
 			this.stageHeight = this.canvas.height = h;
-			this.canvas.style.marginLeft= (-w/2)+"px";
+			this.canvas.style.marginLeft = (-w / 2) + "px";
 		},
 		start : function() {
 			this.renderId = setInterval(this.appRender, 1000 / this.frameRate, this);
@@ -613,4 +652,3 @@
 //---------------------------------------------
 
 //---------------------------------------------
-
