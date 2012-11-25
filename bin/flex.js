@@ -107,6 +107,8 @@
 	Flex.Graphics = function(owner){
 		this.owner = owner;
 		this._steps = [];
+		//调用actions中的方法和参数 重新组装steps的数据
+		this._actions = [];
 		this._fillSetted = false;
 		this._strokeSetted = false;
 	}
@@ -116,11 +118,13 @@
 		beginFill:function(color){
 			this._fillSetted = true;
 			context.save();
+			this._actions.push({method:'beginFill',args:[color]});
 			this._steps.push({prop:"fillStyle",value:color});
 			return this;
 		},
 		lineStyle:function(weight,color,lineCap){
 			context.save();
+			this._actions.push({method:'lineStyle',args:[weight,color,lineCap]});
 			this._strokeSetted = true;
 			var steps = this._steps;
 			steps.push({prop:"strokeStyle",value:color});
@@ -134,6 +138,7 @@
 			this._strokeSetted = false;
 		},
 		drawRect:function(x,y,width,height){
+			this._actions.push({method:'drawRect',args:[x,y,width,height]});
 			var drawX = this.owner.stageX + x;
 			var drawY = this.owner.stageY + y;
 			this.measureSize(x,y,width,height);
@@ -141,6 +146,7 @@
 			return this;
 		},
 		drawCircle:function(x,y,radius){
+			this._actions.push({method:'drawCircle',args:[x,y,radius]});
 			var steps = this._steps;
 			var drawX = this.owner.stageX + x;
 			var drawY = this.owner.stageY + y;
@@ -185,10 +191,27 @@
 					context[currentStep.prop] = currentStep.value;
 				}
 			}
+		},
+		/**
+		 * 当owner的x,y,stageX,stageY发生了变化要重新绘制
+		 */
+		validateRender:function(){
+			this.clear();
+			var actions = this._actions;
+			var len = actions.length;
+			var action;
+			for(var i=0;i<len;i++){
+				action = actions[i];
+				this[action.method].apply(this,action.args)
+			}
+			for(var i=0;i<len;i++){
+				actions.shift();
+			}
 		}
 	}
 	
 })();
+
 
 //---------------------------------------------
 (function() {
@@ -288,6 +311,9 @@
 			var parent = this.parent;
 			this.stageX = this.x + parent.stageX;
 			this.stageY = this.y + parent.stageY;
+			if(this.graphics){
+				this.graphics.validateRender();
+			}
 		},
 		getRect : function() {
 			//TODO
