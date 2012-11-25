@@ -80,6 +80,12 @@
 					context[currentStep.prop] = currentStep.value;
 				}
 			}
+		},
+		/**
+		 * 当owner的x,y,stageX,stageY发生了变化要重新绘制
+		 */
+		validateRender:function(){
+			
 		}
 	}
 	

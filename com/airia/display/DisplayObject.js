@@ -34,6 +34,7 @@
 				set : function(value) {
 					if(this._x != value) {
 						this._x = value;
+						this.validateCoordinate();
 					}
 				}
 			},
@@ -44,6 +45,7 @@
 				set : function(value) {
 					if(this._y != value) {
 						this._y = value;
+						this.validateCoordinate();
 					}
 				}
 			},
@@ -86,6 +88,14 @@
 
 	Flex.DisplayObject.prototype = {
 		constructor : Flex.DisplayObject,
+		/**
+		 * 在被添加到显示列表中的时候 对child的全局坐标进行校验
+		 */
+		validateCoordinate:function(){
+			var parent = this.parent;
+			this.stageX = this.x + parent.stageX;
+			this.stageY = this.y + parent.stageY;
+		},
 		getRect : function() {
 			//TODO
 		},
