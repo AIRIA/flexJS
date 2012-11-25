@@ -637,7 +637,6 @@
 	 * 可以对实例的used属性进行增减操作
 	 */
 	Flex.BitmapData = function(src,rect){
-		this.assets = null;
 		this.loaded = false;
 		//被引用次数
 		this.used = 0;
@@ -650,13 +649,9 @@
 					return this._src;
 				},
 				set:function(value){
-					if(this._src!=value){
+					if(this._src!=value||this.loaded==false){
 						this._src = value;
 						var assets = this.assets,content = this.content,self = this;
-						if(!assets){
-							assets = new Assets();
-							assets.src = value;
-						}
 						if(!content){
 							content = new Image();
 							content.src = value;
@@ -684,6 +679,10 @@
 		this.loaded = false;
 		this.content = null;
 		this.assets = null;
+	}
+	
+	Flex.BitmapData.prototype.load = function(){
+		this.src = this.src;
 	}
 	
 	Flex.BitmapData.prototype.getRect = function(){
@@ -742,7 +741,9 @@
 							}
 						}
 						this._bitmapData = value;
-						trace(this._bitmapData);
+						if(value.used==0){
+							value.load();
+						}
 						this._bitmapData.used += 1;
 						
 					}

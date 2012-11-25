@@ -42,6 +42,9 @@
 							}
 						}
 						this._bitmapData = value;
+						if(value.used==0){
+							value.load();
+						}
 						trace(this._bitmapData);
 						this._bitmapData.used += 1;
 						
