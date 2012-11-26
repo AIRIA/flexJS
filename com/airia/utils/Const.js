@@ -11,4 +11,10 @@
 		
 	}
 	
+	Flex.app.TouchEvent = {
+		TOUCH_END:'touchend',
+		TOUCH_START:'touchstart',
+		TOUCH_MOVE:'touchmove'
+	}
+	
 })();

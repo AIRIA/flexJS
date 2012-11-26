@@ -4,10 +4,13 @@
 		this._children = [];
 		Object.defineProperties(this, {
 			children : {
-				configurable : true,
-				enumerable : true,
 				get : function() {
 					return this._children;
+				}
+			},
+			numChildren:{
+				get :function(){
+					return this.children.length;
 				}
 			}
 		});
@@ -15,13 +18,12 @@
 
 	Flex.DisplayObjectContainer.prototype = {
 		constructor : Flex.DisplayObjectContainer,
-		numChildren : function() {
-			return this.children.length;
-		},
 		addChild : function(child) {
 			var children = this.children;
 			if(children.indexOf(child) == -1) {
 				children.push(child);
+				child.parent = this;
+				child.validateCoordinate();
 			} else {
 				trace(child + '已经存在于' + this + '的显示列表中了', Flex.Const.Log.ERROR);
 			}
@@ -32,18 +34,16 @@
 			var child;
 			for(var i = 0; i < children.length; i++) {
 				child = children[i]
-				if( child instanceof DisplayObject) {
-					this.children.push(child);
-					child.parent = this;
-				} else {
-					trace(child + "不是DisplayObject的实例", Flex.Const.Log.ERROR);
-				}
+				this.children.push(child);
+				child.parent = this;
+				child.validateCoordinate();	
 			}
 			return children;
 		},
 		addChildAt : function(child, index) {
 			this.children.splice(index - 1, 0, child);
 			child.parent = this;
+			child.validateCoordinate();
 			return child;
 		},
 		contains : function(child) {
@@ -98,15 +98,29 @@
 		},
 		//校验组件的各各属性
 		validateProperties : function() {
-
+			var parent = this.parent;
+			if(parent&&!(parent instanceof Flex.Stage)){
+				parent.validateProperties();
+			}
+			var children = this.getChildren();
+			var child;
+			for(var i=0;i<children.length;i++){
+				child = children[i];
+				//设置显示对象测量大小
+				this.measureWidth = Math.max(this.measureWidth,child.x+child.measureWidth);
+				this.measureHeight = Math.max(this.measureHeight,child.y+child.measureHeight);
+				//获取明确设置的尺寸 如果没有明确设置 则获取测量大小
+				// this.width = Math.max(this.explicitOrMeasureWidth,child.x+child.explicitOrMeasureWidth);
+				// this.height = Math.max(this.explicitOrMeasureHeight,child.y+child.explicitOrMeasureHeight);
+			}
 		},
 		//检验组件的尺寸
 		validateSize : function() {
-
+			
 		},
 		//更新组件内部的显示列表
 		validateDisplayList : function() {
-
+				
 		},
 		initialize : function() {
 			this.validateProperties();

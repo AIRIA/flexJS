@@ -50,6 +50,10 @@
 
 	Flex.Stage.prototype = {
 		constructor : Flex.Stage,
+		/**
+		 * init方法中对canvas context 进行初始化
+		 * 并且会注册事件监听器
+		 */
 		init : function(canvasID) {
 			var canvas = document.getElementById(canvasID)
 			this.canvas = canvas;
@@ -61,6 +65,41 @@
 			this.stageWidth = canvas.width;
 			this.stageHeight = canvas.height;
 			Flex.app.context = this.context;
+			var self = this;
+			Flex.EventManager.addHandler(this.canvas,"mouseMove",function(event){
+				self.touchMoveHandler(event);
+			});
+			Flex.EventManager.addHandler(this.canvas,"mousedown",function(event){
+				self.touchStartHandler(event);
+			});
+			Flex.EventManager.addHandler(this.canvas,"click",function(event){
+				self.touchEndHandler(event);
+			});
+		},
+		touchStartHandler:function(event){
+			
+		},
+		touchEndHandler:function(event){
+			safeRun(this.triggerListeners,event,this);
+		},
+		touchMoveHandler:function(event){
+			
+		},
+		triggerListeners:function(event,displayObj){
+			var touch = event;
+			var numChildren = displayObj.numChildren;
+			if(numChildren){
+				//如果有子项的话  就递归调用此方法 直到最内层的元素
+				var children = displayObj.getChildren();
+				for(var i=numChildren-1;i>=0;i--){
+					arguments.callee(event,children[i]);
+				}
+			}else{
+				//将event事件对象传入每个显示对象的mouseEvent方法中 根据event的信息来判断是不是要调用注册的回调函数
+				if(displayObj.isUnderPoint(touch)){
+					displayObj.dispatchEvent(event);
+				}
+			}
 		},
 		setStageSize:function(w,h){
 			this.stageWidth = this.canvas.width = w;
@@ -76,7 +115,7 @@
 			this.state = "stop";
 		},
 		appRender : function(self) {
-			self.context.clearRect(0, 0, this.stageWidth, this.stageHeight);
+			self.context.clearRect(0, 0, self.stageWidth, self.stageHeight);
 			self.render(self);
 
 		},
@@ -86,7 +125,7 @@
 					displayObject.render();
 				}
 			}
-			var numChildren = displayObject.numChildren();
+			var numChildren = displayObject.numChildren;
 			if(numChildren) {
 				var children = displayObject.getChildren();
 				for(var i = 0; i < numChildren; i++) {

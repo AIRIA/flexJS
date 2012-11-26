@@ -7,8 +7,9 @@
 		app:window
 	};
 	Flex.extend = function(sub, sup) {
+		sup.constructor.call(sub);
 		sub.superClass = sup.__proto__;
-		for(prop in sup) {
+		for(prop in sup.__proto__) {
 			sub[prop] ? sub[prop] : sub[prop] = sup[prop];
 		}
 	}
@@ -34,5 +35,18 @@
 		content += ")";
 		res = "console." + type + "(" + content;
 		eval(res);
+	};
+	
+	/**
+	 * 安全执行某个方法  在方法执行的时候会添加try catch处理
+	 */
+	window.safeRun = function(handler){
+		var args = Array.prototype.slice.call(arguments);
+		args.shift();
+		try{
+			handler.apply(null,args);
+		}catch(error){
+			
+		}
 	}
 })(window);
