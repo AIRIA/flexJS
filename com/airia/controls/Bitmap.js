@@ -80,7 +80,10 @@
 			} else {
 				this.height = height = rect.h;
 			}
+			context.save();
+			context.globalAlpha = this.alpha;
 			context.drawImage(bmd.content, rect.x, rect.y, rect.w, rect.h, this.stageX, this.stageY, width, height);
+			context.restore();
 		}
 	}
 })();
