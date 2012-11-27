@@ -1,6 +1,7 @@
 (function(){
 	/**
 	 * 矩形的遮罩区域
+	 * mask的宽高和坐标都是相对于舞台的 
 	 */
 	Flex.RectMask = function(config){
 		this.x = config.x || 0;

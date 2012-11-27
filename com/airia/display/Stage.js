@@ -78,14 +78,17 @@
 			});
 		},
 		touchStartHandler:function(event){
-			
+			safeRun(this.triggerListeners,event,this);
 		},
 		touchEndHandler:function(event){
 			safeRun(this.triggerListeners,event,this);
 		},
 		touchMoveHandler:function(event){
-			
+			safeRun(this.triggerListeners,event,this);
 		},
+		/**
+		 * 每当canvas接收到事件后 都要调用此方法来遍历
+		 */
 		triggerListeners:function(event,displayObj){
 			var touch = event;
 			var numChildren = displayObj.numChildren;
@@ -102,15 +105,24 @@
 				}
 			}
 		},
+		/**
+		 * 设置舞台的大小 并将舞台居中显示
+		 */
 		setStageSize:function(w,h){
 			this.stageWidth = this.canvas.width = w;
 			this.stageHeight = this.canvas.height = h;
 			this.canvas.style.marginLeft= (-w/2)+"px";
 		},
+		/**
+		 * 开始渲染
+		 */
 		start : function() {
 			this.renderId = setInterval(this.appRender, 1000 / this.frameRate, this);
 			this.state = "start";
 		},
+		/**
+		 * 停止渲染
+		 */
 		stop : function() {
 			clearInterval(this.renderId);
 			this.state = "stop";
@@ -120,7 +132,25 @@
 			self.render(self);
 
 		},
+		/**
+		 * 递归调用此方法来 调用每个显示对象的render方法来显示界面
+		 * 目前的渲染是从外到内  即先渲染父容器 在渲染子项显示对象
+		 * 
+		 * 渲染的时候要判断是不是stage 
+		 * 如果是stage的话就不调用render方法 stage的render方法是在appRender方法中调用的
+		 * 
+		 * 如果当前渲染对象的mask属性不为空的话  就调用mask对象的start方法来启动遮罩 
+		 * 完毕之后调用mask对象的end方法来恢复context上下文
+		 * 
+		 */
 		render : function(displayObject) {
+			/**
+			 * 启动遮罩
+			 */
+			if(displayObject.mask){
+				mask.start();
+			}
+			
 			if(!( displayObject instanceof Flex.Stage)) {
 				if(displayObject.render) {
 					displayObject.render();
@@ -132,6 +162,9 @@
 				for(var i = 0; i < numChildren; i++) {
 					arguments.callee(children[i]);
 				}
+			}
+			if(displayObject.mask){
+				mask.end();
 			}
 		}
 	}
