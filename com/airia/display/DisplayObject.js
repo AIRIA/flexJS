@@ -25,8 +25,18 @@
 		this.rotation = 0;
 		this.enable = true;
 		this.parent = null;
-		this.mask = null;
+		this._mask = null;
 		Object.defineProperties(this, {
+			mask:{
+				get:function(){
+					return this._mask;
+				},
+				set:function(value){
+					if(this._mask!=value){
+						this._mask = value;
+					}
+				}
+			},
 			x : {
 				get : function() {
 					return this._x;
@@ -105,8 +115,8 @@
 		 * 根据传进来的事件的pageX pageY来判断组件是不是在此坐标的下面
 		 */
 		isUnderPoint:function(touch){
-			var x = touch.pageX;
-			var y = touch.pageY;
+			var x = touch.pageX-canvas.offsetLeft;
+			var y = touch.pageY-canvas.offsetTop;
 			if(x>this.stageX&&x<(this.stageX+this.explicitOrMeasureWidth)&&y>this.stageY&&y<(this.stageY+this.explicitOrMeasureHeight)){
 				//app.stopPropagation = true;//此处将app的stopXXX属性设置为ture 以停止事件继续传播
 				return true;

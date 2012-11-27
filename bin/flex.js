@@ -372,8 +372,8 @@
 		 * 根据传进来的事件的pageX pageY来判断组件是不是在此坐标的下面
 		 */
 		isUnderPoint:function(touch){
-			var x = touch.pageX;
-			var y = touch.pageY;
+			var x = touch.pageX-canvas.offsetLeft;
+			var y = touch.pageY-canvas.offsetTop;
 			if(x>this.stageX&&x<(this.stageX+this.explicitOrMeasureWidth)&&y>this.stageY&&y<(this.stageY+this.explicitOrMeasureHeight)){
 				//app.stopPropagation = true;//此处将app的stopXXX属性设置为ture 以停止事件继续传播
 				return true;
@@ -619,6 +619,7 @@
 			this.stageWidth = canvas.width;
 			this.stageHeight = canvas.height;
 			Flex.app.context = this.context;
+			Flex.app.canvas = this.canvas;
 			var self = this;
 			Flex.EventManager.addHandler(this.canvas,"mouseMove",function(event){
 				self.touchMoveHandler(event);

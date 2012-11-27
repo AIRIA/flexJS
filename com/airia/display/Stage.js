@@ -65,6 +65,7 @@
 			this.stageWidth = canvas.width;
 			this.stageHeight = canvas.height;
 			Flex.app.context = this.context;
+			Flex.app.canvas = this.canvas;
 			var self = this;
 			Flex.EventManager.addHandler(this.canvas,"mouseMove",function(event){
 				self.touchMoveHandler(event);
