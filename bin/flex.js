@@ -292,8 +292,21 @@
 		this.rotation = 0;
 		this.enable = true;
 		this.parent = null;
-		this.mask = null;
+		this._mask = null;
 		Object.defineProperties(this, {
+			mask:{
+				get:function(){
+					return this._mask;
+				},
+				set:function(value){
+					if(this._mask!=value){
+						this._mask = value;
+						if(value){
+							this._mask.owner = this;
+						}
+					}
+				}
+			},
 			x : {
 				get : function() {
 					return this._x;
@@ -370,18 +383,37 @@
 		},
 		/**
 		 * 根据传进来的事件的pageX pageY来判断组件是不是在此坐标的下面
+		 * 如果存在遮罩的话 热点区域以重叠区域为有效点击区域
+		 * @param {Event} 触发的事件对象
 		 */
 		isUnderPoint:function(touch){
 			var x = touch.pageX-canvas.offsetLeft;
 			var y = touch.pageY-canvas.offsetTop;
-			if(x>this.stageX&&x<(this.stageX+this.explicitOrMeasureWidth)&&y>this.stageY&&y<(this.stageY+this.explicitOrMeasureHeight)){
-				//app.stopPropagation = true;//此处将app的stopXXX属性设置为ture 以停止事件继续传播
+			var mask = this.mask;
+			if(mask){
+				// var maskRect = new Flex.Rectangle(mask.stageX,mask.stageY,mask.width,mask.height);
+				// var selfRect = this.getRect();
+				if(x>mask.stageX&&x<(mask.stageX+mask.width)&&y>mask.stageY&&y<(mask.stageY+mask.width)){
+					return true;
+				}
+				return false;
+			}else if(x>this.stageX&&x<(this.stageX+this.explicitOrMeasureWidth)&&y>this.stageY&&y<(this.stageY+this.explicitOrMeasureHeight)){
 				return true;
 			}
 			return false;
 		},
-		getRect : function() {
-			//TODO
+		/**
+		 * 指定坐标系
+		 * @param {Flex.DisplayObject} 参考的坐标系
+		 */
+		getRect : function(targetCoordinateSpace) {
+			var rect;
+			if(targetCoordinateSpace){
+				rect = new Flex.Rectangle(this.stageX,this.stageY,this.width,this.height);
+			}else{
+				rect = new Flex.Rectangle(this.stageX,this.stageY,this.width,this.height);
+			}
+			return rect;
 		},
 		getBounds : function() {
 			//TODO
@@ -934,20 +966,23 @@
 (function(){
 	/**
 	 * 矩形的遮罩区域
+	 * mask的坐标都是相对于被遮罩的显示对象的的 
 	 */
 	Flex.RectMask = function(config){
-		this.x = config.x || 0;
-		this.y = config.y || 0;
+		Flex.extend(this,new Flex.BaseMask(config));
 		this.width = config.width;
 		this.height = config.height;
+		//被遮罩的对象
+		this.owner = null;
 	}
 	
 	Flex.RectMask.prototype = {
 		constructor:Flex.RectMask,
 		start:function(){
+			var owner = this.owner;
 			context.save();
 			context.beginPath();
-			context.rect(this.x,this.y,this.width,this.height);
+			context.rect(this.stageX,this.stageY,this.width,this.height);
 			context.clip();
 			context.closePath();
 		},
@@ -964,8 +999,7 @@
 	 * 圆形的遮罩区域
 	 */
 	Flex.RoundMask = function(config){
-		this.x = config.x || 0;
-		this.y = config.y || 0;
+		Flex.extend(this,new Flex.BaseMask(config));
 		this.radius = config.radius;
 	}
 	
@@ -974,7 +1008,7 @@
 		start:function(){
 			context.save();
 			context.beginPath();
-			context.arc(this.x,this.y,this.radius,0,Math.PI*2,false);
+			context.arc(this.stageX,this.stageY,this.radius,0,Math.PI*2,false);
 			context.clip();
 			context.closePath();
 		},
@@ -985,10 +1019,136 @@
 })();
 
 //---------------------------------------------
+(function(){
+	/**
+	 * Point 对象表示二维坐标系统中的某个位置，其中 x 表示水平轴，y 表示垂直轴。 
+	 */
+	Flex.Point = function(x,y){
+		this.x = x || 0;
+		this.y = y || 0;
+	}
+})();
 
 //---------------------------------------------
-
+(function(){
+	/**
+	 * Rectangle 对象是按其位置（由它左上角的点 (x, y) 确定）以及宽度和高度定义的区域。 
+	 * Rectangle 类的 x、y、width 和 height 属性相互独立；更改一个属性的值不会影响其它属性。 
+	 * 但是，right 和 bottom 属性与这四个属性是整体相关的。 
+	 * 例如，如果更改 right 属性的值，则 width 属性的值将发生变化；如果更改 bottom 属性，则 height 属性的值将发生变化。 
+	 */
+	Flex.Rectangle = function(x,y,width,height){
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		Object.defineProperties(this,{
+			/**
+			 * y 和 height 属性的和。
+			 */
+			bottom:{
+				get:function(){
+					return this.y+this.height;
+				}
+			},
+			/**
+			 * 由 right 和 bottom 属性的值确定的 Rectangle 对象的右下角的位置。
+			 */
+			bottomRight:{
+				get:function(){
+					return new Point(this.right,this.bottom);
+				}
+			},
+			/**
+			 * 矩形左上角的 x 坐标。
+			 */
+			left:{
+				get:function(){
+					return this.x;
+				}
+			},
+			/**
+			 * x 和 width 属性的和。
+			 */
+			right:{
+				get:function(){
+					return this.x+this.width;
+				}
+			},
+			/**
+			 * 矩形左上角的 y 坐标。
+			 */
+			top:{
+				get:function(){
+					return this.y;
+				}
+			},
+			/**
+			 * 由该点的 x 和 y 坐标确定的 Rectangle 对象左上角的位置。
+			 */
+			topLeft:{
+				get:function(){
+					return new Point(this.x,this.y);
+				}
+			}
+		});
+	}
+	
+	Flex.Rectangle.prototype = {
+		constructor:Flex.Rectangle,
+		/**
+		 * 获取两个Rectangle实例的交叉区域
+		 * 实现思路 分左右两种情况来考虑 如果
+		 * 
+		 * 
+		 * @param {Flex.Rectangle} 获取与rect的交叉区域
+		 * @type {Flex.Rectangle}
+		 * 
+		 */
+		getCross:function(rect){
+			//TODO
+			var rectTopLeft = rect.topLeft;
+			var rectBottomRight = rect.bottomRight;
+			var selfTopLeft = self.topLeft;
+			var selfBottomRight = self.bottomRight;
+			return new Flex.Rectangle();
+		},
+		/**
+		 * 判断两个矩形是否相交
+		 */
+		isCross:function(rect){
+			//TODO
+		}
+	}
+	
+})();
 //---------------------------------------------
+(function(){
+	/**
+	 * 遮罩的区域的坐标都是相对于owner的坐标系
+	 * 在执行clip的时候 都是使用stageX stageY 来作为绘制的X Y
+	 * 而且在设置遮罩后 遮罩的区域和owner的交叉区域将作为owner的可点击区域
+	 */
+	Flex.BaseMask = function(config){
+		config = config || {};
+		this.x = config.x || 0;
+		this.y = config.y || 0;
+		//被遮罩的对象
+		this.owner = null;
+		Object.defineProperties(this,{
+			stageX:{
+				get:function(){
+					return this.x+this.owner.stageX;
+				}
+			},
+			stageY:{
+				get:function(){
+					return this.y+this.owner.stageY;	
+				}
+			}
+		});
+	};
+})();
 
 //---------------------------------------------
 

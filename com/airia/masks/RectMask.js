@@ -1,21 +1,23 @@
 (function(){
 	/**
 	 * 矩形的遮罩区域
-	 * mask的宽高和坐标都是相对于舞台的 
+	 * mask的坐标都是相对于被遮罩的显示对象的的 
 	 */
 	Flex.RectMask = function(config){
-		this.x = config.x || 0;
-		this.y = config.y || 0;
+		Flex.extend(this,new Flex.BaseMask(config));
 		this.width = config.width;
 		this.height = config.height;
+		//被遮罩的对象
+		this.owner = null;
 	}
 	
 	Flex.RectMask.prototype = {
 		constructor:Flex.RectMask,
 		start:function(){
+			var owner = this.owner;
 			context.save();
 			context.beginPath();
-			context.rect(this.x,this.y,this.width,this.height);
+			context.rect(this.stageX,this.stageY,this.width,this.height);
 			context.clip();
 			context.closePath();
 		},

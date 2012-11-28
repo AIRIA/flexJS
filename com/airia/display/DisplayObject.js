@@ -34,6 +34,9 @@
 				set:function(value){
 					if(this._mask!=value){
 						this._mask = value;
+						if(value){
+							this._mask.owner = this;
+						}
 					}
 				}
 			},
@@ -113,18 +116,37 @@
 		},
 		/**
 		 * 根据传进来的事件的pageX pageY来判断组件是不是在此坐标的下面
+		 * 如果存在遮罩的话 热点区域以重叠区域为有效点击区域
+		 * @param {Event} 触发的事件对象
 		 */
 		isUnderPoint:function(touch){
 			var x = touch.pageX-canvas.offsetLeft;
 			var y = touch.pageY-canvas.offsetTop;
-			if(x>this.stageX&&x<(this.stageX+this.explicitOrMeasureWidth)&&y>this.stageY&&y<(this.stageY+this.explicitOrMeasureHeight)){
-				//app.stopPropagation = true;//此处将app的stopXXX属性设置为ture 以停止事件继续传播
+			var mask = this.mask;
+			if(mask){
+				// var maskRect = new Flex.Rectangle(mask.stageX,mask.stageY,mask.width,mask.height);
+				// var selfRect = this.getRect();
+				if(x>mask.stageX&&x<(mask.stageX+mask.width)&&y>mask.stageY&&y<(mask.stageY+mask.width)){
+					return true;
+				}
+				return false;
+			}else if(x>this.stageX&&x<(this.stageX+this.explicitOrMeasureWidth)&&y>this.stageY&&y<(this.stageY+this.explicitOrMeasureHeight)){
 				return true;
 			}
 			return false;
 		},
-		getRect : function() {
-			//TODO
+		/**
+		 * 指定坐标系
+		 * @param {Flex.DisplayObject} 参考的坐标系
+		 */
+		getRect : function(targetCoordinateSpace) {
+			var rect;
+			if(targetCoordinateSpace){
+				rect = new Flex.Rectangle(this.stageX,this.stageY,this.width,this.height);
+			}else{
+				rect = new Flex.Rectangle(this.stageX,this.stageY,this.width,this.height);
+			}
+			return rect;
 		},
 		getBounds : function() {
 			//TODO
