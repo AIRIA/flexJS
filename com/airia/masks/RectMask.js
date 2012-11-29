@@ -4,7 +4,7 @@
 	 * mask的坐标都是相对于被遮罩的显示对象的的 
 	 */
 	Flex.RectMask = function(config){
-		Flex.extend(this,new Flex.BaseMask(config));
+		Flex.extend(this,new Flex.BaseMask(config),config);
 		this.width = config.width;
 		this.height = config.height;
 		//被遮罩的对象

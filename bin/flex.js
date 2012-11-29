@@ -8,7 +8,10 @@
 		app:window
 	};
 	Flex.extend = function(sub, sup) {
-		sup.constructor.call(sub);
+		var args = Array.prototype.slice.call(arguments);
+		args.shift();
+		args.shift();
+		sup.constructor.apply(sub,args);
 		sub.superClass = sup.__proto__;
 		for(prop in sup.__proto__) {
 			sub[prop] ? sub[prop] : sub[prop] = sup[prop];
@@ -969,7 +972,7 @@
 	 * mask的坐标都是相对于被遮罩的显示对象的的 
 	 */
 	Flex.RectMask = function(config){
-		Flex.extend(this,new Flex.BaseMask(config));
+		Flex.extend(this,new Flex.BaseMask(config),config);
 		this.width = config.width;
 		this.height = config.height;
 		//被遮罩的对象
@@ -999,7 +1002,7 @@
 	 * 圆形的遮罩区域
 	 */
 	Flex.RoundMask = function(config){
-		Flex.extend(this,new Flex.BaseMask(config));
+		Flex.extend(this,new Flex.BaseMask(config),config);
 		this.radius = config.radius;
 	}
 	
@@ -1130,6 +1133,7 @@
 	 * 而且在设置遮罩后 遮罩的区域和owner的交叉区域将作为owner的可点击区域
 	 */
 	Flex.BaseMask = function(config){
+		trace(config);
 		config = config || {};
 		this.x = config.x || 0;
 		this.y = config.y || 0;

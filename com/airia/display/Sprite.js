@@ -1,6 +1,6 @@
 (function(){
 	Flex.Sprite = function(config){
-		Flex.extend(this,new Flex.DisplayObjectContainer(config));
+		Flex.extend(this,new Flex.DisplayObjectContainer(config),config);
 		this._graphics = null;
 		Object.defineProperties(this,{
 			graphics:{

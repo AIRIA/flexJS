@@ -7,7 +7,10 @@
 		app:window
 	};
 	Flex.extend = function(sub, sup) {
-		sup.constructor.call(sub);
+		var args = Array.prototype.slice.call(arguments);
+		args.shift();
+		args.shift();
+		sup.constructor.apply(sub,args);
 		sub.superClass = sup.__proto__;
 		for(prop in sup.__proto__) {
 			sub[prop] ? sub[prop] : sub[prop] = sup[prop];

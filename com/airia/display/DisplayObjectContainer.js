@@ -1,6 +1,6 @@
 (function() {
 	Flex.DisplayObjectContainer = function(config) {
-		Flex.extend(this, new Flex.DisplayObject(config));
+		Flex.extend(this, new Flex.DisplayObject(config),config);
 		this._children = [];
 		Object.defineProperties(this, {
 			children : {

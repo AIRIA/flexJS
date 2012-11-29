@@ -3,7 +3,7 @@
 	 * 圆形的遮罩区域
 	 */
 	Flex.RoundMask = function(config){
-		Flex.extend(this,new Flex.BaseMask(config));
+		Flex.extend(this,new Flex.BaseMask(config),config);
 		this.radius = config.radius;
 	}
 	
