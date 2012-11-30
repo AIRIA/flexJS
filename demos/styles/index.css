@@ -1,0 +1,150 @@
+* {
+	margin: 0px;
+	padding: 0px;
+	text-decoration: none;
+	scrollbar-arrow-color: red;
+	scrollbar-base-color: #333333;
+	scrollbar-face-color: red;
+}
+::-webkit-scrollbar-button {
+	height: 0;
+	width: 0
+}
+::-webkit-scrollbar {
+	height: 0px;
+	width: 0px
+}
+body {
+	background: url(../images/footer.jpg) repeat-y;
+}
+#topNav {
+	position: fixed;
+	top: 0px;
+	width: 100%;
+	height: 38px;
+	background-color: rgba(29,104,196,0.6);
+	border-bottom: solid 2px rgba(29,104,196,0.8);
+	z-index: 100;
+}
+#topNav #nav {
+	margin-left: 90px;
+}
+#topNav #nav a {
+	display: block;
+	font-size: 13px;
+	line-height: 38px;
+	vertical-align: middle;
+	text-align: center;
+	color: #333333;
+	width: 120px;
+	cursor: pointer;
+	float: left;
+}
+#topNav #nav a:hover {
+	background-color: rgba(12,23,23,0.8);
+	color: white;
+	border-left: solid 3px white;
+}
+
+.topNavSelect{
+	background-color: rgba(12,23,23,0.8) !important;
+	color: white !important;
+	border-left: solid 3px white !important;
+}
+
+#topNav .content {
+	position: absolute;
+	left: 50%;
+	margin-left: -500px;
+	width: 1000px;
+	height: 100%;
+}
+#topNav .content div {
+	float: left;
+}
+#topNav .content div span {
+	line-height: 38px;
+	vertical-align: middle;
+}
+#mainBox {
+	margin-top: 60px;
+	border-top: solid 2px #1D68C4;
+	border-top-left-radius: 15px;
+	border-top-right-radius: 15px;
+	width: 1000px;
+	top: 0px;
+	bottom: 0px;
+	margin-left: -500px;
+	left: 50%;
+	position: absolute;
+	padding-bottom: 40px;
+}
+#mainBox #navBox {
+	width: 200px;
+	height: 100%;
+	padding: 0px 0px 0px 0px;
+	border-top-left-radius: 15px;
+	float: left;
+	background-color: rgba(29,104,196,0.2);
+	font: 13px "Agency FB" ;
+}
+#mainBox #navBox a:first-child {
+	margin-top: 20px;
+}
+#mainBox #navBox a {
+	display: block;
+	border: solid 1px white;
+	border-radius: 3px;
+	margin: 5px 0px 0px 10px;
+	width: 180px;
+	text-align: center;
+	padding: 5px 0px 5px 0px;
+	color: #333333;
+	cursor: pointer;
+	background: rgba(255,255,255,0.5) url(../images/right.png) no-repeat 15px;
+	outline: none;
+}
+#mainBox #navBox a:active {
+	background: rgba(255,22,33,0.5) url(../images/right.png) no-repeat 150px;
+}
+#mainBox #navBox a:hover{
+	color: #FFFFFF;
+	background: rgba(255,22,33,0.5) url(../images/right.png) no-repeat 150px;
+}
+
+.navSelect{
+	color: #FFFFFF !important;
+	background: rgba(255,22,33,0.5) url(../images/right.png) no-repeat 150px !important;
+}
+
+#mainBox #content {
+	width: 800px;
+	height: 100%;
+	border-top-right-radius: 15px;
+	background-color: rgba(255,255,255,0.5);
+	float: left;
+}
+#foot {
+	position: fixed;
+	bottom: 0px;
+	height: 38px;
+	width: 100%;
+	text-align: center;
+	background-color: rgba(29,104,196,0.6);
+	border-top: solid 2px rgba(29,104,196,0.8);
+}
+#foot span {
+	color: #FFFFFF;
+	font-size: 12px;
+	font-family: "微软雅黑";
+	line-height: 38px;
+}
+#mainBox #content #wrap {
+	left:220px;
+	bottom:40px;
+	top:20px;
+	right:20px;
+	position: absolute;
+	border:solid 1px #A7D0E8;
+	background-color: rgba(167,208,232,0.1);
+}

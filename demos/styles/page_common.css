@@ -1,0 +1,27 @@
+*{
+	padding: 0px;
+	margin: 0px;
+	font-size:13px;
+	color:#333333;
+}
+
+#content{
+	width: 738px;
+	padding: 10px;
+}
+
+div.txt{
+	padding: 15px 0px;
+}
+
+pre{
+	font: 13px;
+	border: solid 1px white;
+	padding:5px;
+	background: rgba(167,208,232,0.5);
+}
+
+canvas{
+	border: solid 1px #CCCCCC;
+	background:#005599;
+}
