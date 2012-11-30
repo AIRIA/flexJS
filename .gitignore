@@ -2,5 +2,4 @@ bin-release/
 *.html
 .project
 app/
-demos/
 .settings
