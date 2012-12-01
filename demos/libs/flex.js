@@ -111,7 +111,7 @@
 			var parent = this.parent;
 			if(parent) {
 				parent.dispatchEvent(event);
-			} else {
+			} else if(this.getRect) {
 				throw new Error("normal quit");
 			}
 		}
@@ -1153,6 +1153,152 @@
 		});
 	};
 })();
+
+//---------------------------------------------
+(function(){
+	/**
+	 * @class Flex.Event
+	 * @description Event 类作为创建 Event 对象的基类，当发生事件时，Event 对象将作为参数传递给事件侦听器。
+	 * @constructor
+	 */
+	Flex.Event = function(type,bubbles,cancleable){
+		/**
+		 * @description [read-only] 事件的类型。
+		 * @field
+		 */
+		this.type = type;
+		/**
+		 * @description [read-only] 是否可以冒泡
+		 * @field
+		 */
+		this.bubbles = bubbles || false;
+		/**
+		 * [read-only] 指示是否可以阻止与事件相关联的行为。 
+		 * @field
+		 */
+		this.cancleable = cancleable || false;
+		/**
+		 * @description [read-only] 事件目标。 
+		 * @field
+		 */
+		this.target = null;
+	}
+	
+	Flex.Event.prototype = {
+		constructor:Flex.Event,
+		/**
+		 * 防止对事件流中当前节点的后续节点中的所有事件侦听器进行处理。 
+		 */
+		stopPropagation:function(){
+			
+		},
+		/**
+		 * 防止对事件流中当前节点中和所有后续节点中的事件侦听器进行处理。 
+		 */
+		stopImmediatePropagation:function(){
+			
+		},
+		/**
+		 * 如果可以取消事件的默认行为，则取消该行为。
+		 */
+		preventDefault:function(){
+			
+		}
+	}
+})();
+
+//---------------------------------------------
+var TimerEvent = {
+	TIMER:'timer',
+	TIMER_COMPLETE:'timer_complete'
+};
+//---------------------------------------------
+(function(){
+	/**
+	 * @author AIRIA
+	 * @class Flex.Timer
+	 * @extends Flex.EventDispatcher 
+	 * @description Flex.Timer 类是 计时器的接口。 可以创建新的 Timer 对象，以便按指定的时间顺序运行代码。 使用 start() 方法来启动计时器。 为 timer 事件添加事件侦听器，以便将代码设置为按计时器间隔运行
+	 * @constructor 构造方法
+	 * @param {Number} 计时器事件间的延迟（以毫秒为单位）
+	 * @param {Number} 指定重复次数
+	 */
+	Flex.Timer = function(delay, repeatCount) {
+		Flex.extend(this,new Flex.EventDispatcher());
+		/**
+		 * @description [read-only] 计时器从 0 开始后触发的总次数。
+		 * @field
+		 */
+		this.currentCount = 0;
+		/**
+		 * @description 计时器事件间的延迟（以毫秒为单位）。
+		 * @field
+		 */
+		this.delay = delay;
+		/**
+		 * @description 设置的计时器运行总次数。
+		 * @field
+		 */
+		this.repeatCount = repeatCount;
+		/**
+		 * @description [read-only] 计时器的当前状态；如果计时器正在运行，则为 true，否则为 false。
+		 * @field
+		 */
+		this.running = false;
+		
+		this.timerId = null;
+		
+	}
+
+	Flex.Timer.prototype = {
+		constructor : Flex.Timer,
+		/**
+		 * @description 如果计时器尚未运行，则启动计时器。
+		 */
+		start : function() {
+			var self = this;
+			this.timerId = setTimeout(function(){
+				self._timeComplete();
+			},this.delay);
+		},
+		_timeComplete:function(){
+			this.running = true;
+			this.dispatchEvent(new Flex.Event(TimerEvent.TIMER));
+			if(this.currentCount!=this.repeatCount){
+				this.currentCount++;
+				this.start();
+			}else{
+				this.dispatchEvent(new Flex.Event(TimerEvent.TIMER_COMPLETE));
+			}
+		},
+		/**
+		 * @description 如果计时器正在运行，则停止计时器，并将 currentCount 属性设回为 0，这类似于秒表的重置按钮。
+		 */
+		reset : function() {
+
+		},
+		/**
+		 * @description 停止计时器。 
+		 */
+		stop : function() {
+
+		}
+	}
+
+})();
+//---------------------------------------------
+
+//---------------------------------------------
+
+//---------------------------------------------
+
+//---------------------------------------------
+
+//---------------------------------------------
+
+//---------------------------------------------
+
+//---------------------------------------------
 
 //---------------------------------------------
 
