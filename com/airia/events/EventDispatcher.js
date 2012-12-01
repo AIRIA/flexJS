@@ -54,7 +54,7 @@
 			var parent = this.parent;
 			if(parent) {
 				parent.dispatchEvent(event);
-			} else {
+			} else if(this.getRect){//getRect来判断是不是displayObject类型的对象
 				throw new Error("normal quit");
 			}
 		}

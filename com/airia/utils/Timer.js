@@ -8,8 +8,8 @@
 	 * @param {Number} 计时器事件间的延迟（以毫秒为单位）
 	 * @param {Number} 指定重复次数
 	 */
-	Flex.Timer = function(delay, repeateCount) {
-		Flex.extend(this,Flex.EventDispatcher());
+	Flex.Timer = function(delay, repeatCount) {
+		Flex.extend(this,new Flex.EventDispatcher());
 		/**
 		 * @description [read-only] 计时器从 0 开始后触发的总次数。
 		 * @field
@@ -24,7 +24,7 @@
 		 * @description 设置的计时器运行总次数。
 		 * @field
 		 */
-		this.repeateCount = repeateCount;
+		this.repeatCount = repeatCount;
 		/**
 		 * @description [read-only] 计时器的当前状态；如果计时器正在运行，则为 true，否则为 false。
 		 * @field
@@ -41,12 +41,18 @@
 		 * @description 如果计时器尚未运行，则启动计时器。
 		 */
 		start : function() {
+			this.running = true;
 			var self = this;
 			this.timerId = setTimeout(this._timeComplete,this.delay);
 		},
 		_timeComplete:function(){
-			this.currentCount++;
-			this.dispatcherEvent(new Flex.Event(TimerEvent.TIMER));
+			this.dispatchEvent(new Flex.Event(TimerEvent.TIMER));
+			if(this.currentCount!=this.repeatCount){
+				this.currentCount++;
+				this.start();
+			}else{
+				this.dispatchEvent(new Flex.Event(TimerEvent.TIMER_COMPLETE));
+			}
 		},
 		/**
 		 * @description 如果计时器正在运行，则停止计时器，并将 currentCount 属性设回为 0，这类似于秒表的重置按钮。
@@ -58,7 +64,7 @@
 		 * @description 停止计时器。 
 		 */
 		stop : function() {
-
+			
 		}
 	}
 
