@@ -1368,7 +1368,7 @@ var TimerEvent = {
 					if(child.explicitOrMeasureWidth > maxWidth) {
 						maxWidth = child.explicitOrMeasureWidth;
 					}
-					this.measureHeight = child.y + child.height;
+					this.measureHeight = child.y + child.explicitOrMeasureHeight;
 				}
 				this.measureWidth = maxWidth+this.paddingLeft+this.paddingRight;
 				this.measureHeight+= this.paddingBottom;
