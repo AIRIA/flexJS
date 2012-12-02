@@ -25,7 +25,7 @@
 				child.parent = this;
 				child.validateCoordinate();
 			} else {
-				trace(child + '已经存在于' + this + '的显示列表中了', Flex.Const.Log.ERROR);
+				trace(child + '已经存在于' + this + '的显示列表中了', Log.ERROR);
 			}
 			return child;
 		},
