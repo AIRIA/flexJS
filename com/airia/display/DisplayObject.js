@@ -112,6 +112,9 @@
 				if(this.graphics) {
 					this.graphics.validateRender();
 				}
+				if(this.updateDisplayList){
+					this.updateDisplayList();
+				}
 			}
 		},
 		/**

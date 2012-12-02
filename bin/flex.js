@@ -382,6 +382,9 @@
 				if(this.graphics) {
 					this.graphics.validateRender();
 				}
+				if(this.updateDisplayList){
+					this.updateDisplayList();
+				}
 			}
 		},
 		/**
@@ -1349,13 +1352,18 @@ var TimerEvent = {
 			var numChildren = this.numChildren;
 			var child;
 			var maxWidth = 0;
+			var maxHeight = 0;
 			if(this.direction=="vertical"){
 				for(var i=0;i<numChildren;i++){
 					child = children[i];
+					child.stageX = this.paddingLeft+this.stageX;
 					child.x = this.paddingLeft;
-					child.y = this.verticalGap + this.explicitOrMeasureHeight;
+					child.y = this.measureHeight;
+					child.stageY = this.stageY+child.y;
 					if(i == 0) {
 						child.y += this.paddingTop;
+					}else{
+						child.y+=this.verticalGap;
 					}
 					if(child.explicitOrMeasureWidth > maxWidth) {
 						maxWidth = child.explicitOrMeasureWidth;
@@ -1365,7 +1373,24 @@ var TimerEvent = {
 				this.measureWidth = maxWidth+this.paddingLeft+this.paddingRight;
 				this.measureHeight+= this.paddingBottom;
 			}else{
-				
+				for (var i=0; i < numChildren; i++) {
+					child = children[i];
+					child.stageY = this.paddingTop+this.stageY;
+					child.y = this.paddingTop;
+					child.x = this.measureWidth;
+					child.stageX = this.stageX+child.x;
+					if(i==0){
+						child.x += this.paddingLeft;	
+					}else{
+						child.x+=this.horizontalGap;
+					}
+					if(child.explicitOrMeasureHeight>maxHeight){
+						maxHeight = child.explicitOrMeasureHeight;
+					}
+					this.measureWidth = child.x + child.explicitOrMeasureWidth;
+				}
+				this.measureHeight = maxHeight+this.paddingTop+this.paddingBottom;
+				this.measureWidth+= this.paddingRight;
 			}
 		}
 	}
