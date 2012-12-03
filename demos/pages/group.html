@@ -19,10 +19,62 @@
 	<body>
 		<div id="content">
 			<div class="txt" id="intro">
-				以下是canvas运行的效果:
+				以下是canvas运行的效果 可以点击图片来更改group的布局:
 			</div>
 			<canvas id="myCanvas" width="736" height="500"></canvas>
+			<div class="txt">
+				下面的代码很简单 应该不用解释
+			</div>
 			<pre id="code" class="javascript">
+(function(){
+	var stage = new Flex.Stage("myCanvas");
+	var bmd = new Flex.BitmapData("http://nodejs.org/images/logo.png");
+	var bitmap = new Flex.Bitmap(bmd);
+	stage.addChild(bitmap);
+	
+	var group1 = new Flex.Group();
+	for(var i=0;i<3;i++){
+		bmd = new Flex.BitmapData("http://nodejs.org/images/logo.png");
+		bitmap = new Flex.Bitmap(bmd);
+		bitmap.width = 200;
+		bitmap.height = 50;
+		group1.addChild(bitmap);
+	}
+	
+	group1.x = 400;
+	stage.addChild(group1);
+	
+	var group2 = new Flex.Group();
+	group2.direction = "horizontal";
+	for(var i=0;i<3;i++){
+		bmd = new Flex.BitmapData("http://nodejs.org/images/logo.png");
+		bitmap = new Flex.Bitmap(bmd);
+		bitmap.width = 200;
+		bitmap.height = 50;
+		group2.addChild(bitmap);
+	}
+	group2.y = group1.measureHeight+100;
+	stage.addChild(group2);
+	group2.addEventListener("click",function(event){
+		if(group2.direction=="vertical"){
+			group2.direction = "horizontal";
+		}else{
+			group2.direction = "vertical";
+		}
+	});
+	
+	group1.addEventListener("click",clickHandler);
+	function clickHandler(event){
+		trace(event);
+		if(group1.direction=="vertical"){
+			group1.direction = "horizontal";
+		}else{
+			group1.direction = "vertical";
+		}
+		
+	}
+})();
+
 		</pre>
 		</div>
 		<script type="text/javascript" charset="UTF-8" src="../scripts/group.js"></script>

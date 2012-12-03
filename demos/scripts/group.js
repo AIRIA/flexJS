@@ -34,7 +34,6 @@
 			group2.direction = "vertical";
 		}
 	});
-	
 	group1.addEventListener("click",clickHandler);
 	function clickHandler(event){
 		trace(event);
@@ -43,6 +42,5 @@
 		}else{
 			group1.direction = "vertical";
 		}
-		
 	}
 })();
