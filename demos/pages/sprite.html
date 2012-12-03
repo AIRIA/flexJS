@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Sprite</title>
+		<script type="text/javascript" src="http://runjs.cn/js/sandbox/jquery/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="../highlight/highlight.pack.js"></script>
+		<link rel="stylesheet" href="../highlight/styles/sunburst.css" />
+		<link  rel="stylesheet" href="../styles/page_common.css" />
+		<script type="text/javascript" src="../libs/flex.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				hljs.tabReplace = '  ';
+				hljs.initHighlightingOnLoad();
+				hljs.highlightBlock(document.getElementById("code"));
+			});
+		</script>
+	</head>
+	<body>
+		<div id="content">
+			<div class="txt" id="intro">
+				以下是canvas运行的效果 :
+			</div>
+			<canvas id="appCanvas" width="736" height="500"></canvas>
+			<div class="txt">
+				Sprite类继承了DisplayObjectContainer 里面的graphics属性是Flex.Graphics的实例\n
+				Graphics可以绘制矩形和圆形 还有各种路径
+			</div>
+			<pre id="code" class="javascript">
+(function() {
+	//所有的类都有Flex的前缀 把Flex添加到了global作用域
+	//查找的时候 去flex的作用域下去查找
+	//stage的构造方法可以接受两个参数 第一个 canvas的id 第二个是帧率
+	//如果省略了第二个参数 那么帧速默认为24FPS
+	var stage = new Flex.Stage("appCanvas");
+	var sprite = new Flex.Sprite();
+	//调用addChild方法就将sprite添加到了舞台上 目前还没有任何效果
+	stage.addChild(sprite);
+	//下面我们在sprite上进行绘制  目前只能绘制  矩形和圆形
+	var graphics = sprite.graphics;
+	//绘制一个矩形
+	graphics.beginFill("#333333");
+	graphics.drawRect(0, 0, 200, 200);
+	graphics.endFill();
+	//绘制圆形
+	graphics.beginFill("rgba(23,23,23,0.5)");
+	//参数 圆心的坐标 x y 半径radius
+	graphics.drawCircle(300, 300, 100);
+	graphics.endFill();
+})();
+
+		</pre>
+		</div>
+		<script defer="defer" type="text/javascript" src="../scripts/sprite.js"></script>
+	</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Bitmap</title>
+		<script type="text/javascript" src="http://runjs.cn/js/sandbox/jquery/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="../highlight/highlight.pack.js"></script>
+		<link rel="stylesheet" href="../highlight/styles/sunburst.css" />
+		<link  rel="stylesheet" href="../styles/page_common.css" />
+		<script type="text/javascript" src="../libs/flex.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				hljs.tabReplace = '  ';
+				hljs.initHighlightingOnLoad();
+				hljs.highlightBlock(document.getElementById("code"));
+			});
+		</script>
+	</head>
+	<body>
+		<div id="content">
+			<div class="txt" id="intro">
+				Bitmap使用的时候 结合BitmapData 一下是Canvas运行效果图:
+			</div>
+			<canvas id="myCanvas" width="736" height="500"></canvas>
+			<div class="txt">
+				
+			</div>
+			<pre id="code" class="javascript">
+(function(){
+	//参数是canvas domID
+	var stage = new Flex.Stage("myCanvas");
+	//可以通过设置frameRate属性来动态改变渲染的帧率 我们将FPS设置成60
+	stage.frameRate = 60;
+	/**
+	 * BitmapData接收两个参数 第一个是图片的src 第二个是截取图片的大小和坐标信息 是一个JSON对象
+	 * {x,y,width,height} 如果没有设置第二个参数的话 就会取图像的实际大小
+	 */
+	var bmd1 = new Flex.BitmapData("http://cdn-img.easyicon.cn/png/5221/522185.png");
+	//bitmap接受
+	var bitmap = new Flex.Bitmap(bmd1);
+	bitmap.x = 100;
+	bitmap.y = 100;
+	stage.addChild(bitmap);
+	//到目前为止一张原始尺寸的图片就出来了 下面我们来给他添加点击事件来更新图片的尺寸和坐标信息
+	bitmap.addEventListener("click",clickHandler);
+	function clickHandler(event){
+		bitmap.width = 100;
+		bitmap.height = 100;
+		bitmap.x = 200;
+	}
+})()
+
+		</pre>
+		</div>
+		<script type="text/javascript" charset="UTF-8" src="../scripts/bitmap.js"></script>
+	</body>
+</html>

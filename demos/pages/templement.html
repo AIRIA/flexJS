@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Bitmap</title>
+		<script type="text/javascript" src="http://runjs.cn/js/sandbox/jquery/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="../highlight/highlight.pack.js"></script>
+		<link rel="stylesheet" href="../highlight/styles/sunburst.css" />
+		<link  rel="stylesheet" href="../styles/page_common.css" />
+		<script type="text/javascript" src="../libs/flex.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				hljs.tabReplace = '  ';
+				hljs.initHighlightingOnLoad();
+				hljs.highlightBlock(document.getElementById("code"));
+			});
+		</script>
+	</head>
+	<body>
+		<div id="content">
+			<div class="txt" id="intro">
+				以下是canvas运行的效果:
+			</div>
+			<canvas id="myCanvas" width="736" height="500"></canvas>
+			<pre id="code" class="javascript">
+		</pre>
+		</div>
+		<script type="text/javascript" charset="UTF-8" src="../scripts/bitmap.js"></script>
+	</body>
+</html>
