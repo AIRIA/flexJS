@@ -14,6 +14,7 @@
 	graphics.drawRect(0, 0, 200, 200);
 	graphics.endFill();
 	//绘制半透明的圆形
+	graphics.lineStyle(3,'#CCCCCC','round');
 	graphics.beginFill("rgba(23,23,23,0.5)");
 	//参数 圆心的坐标 x y 半径radius
 	graphics.drawCircle(310, 110, 100);

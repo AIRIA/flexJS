@@ -404,6 +404,7 @@
 				}
 				return false;
 			}else if(x>this.stageX&&x<(this.stageX+this.explicitOrMeasureWidth)&&y>this.stageY&&y<(this.stageY+this.explicitOrMeasureHeight)){
+				trace(this);
 				return true;
 			}
 			return false;
@@ -1478,6 +1479,7 @@ var TimerEvent = {
 
 })();
 
+
 //---------------------------------------------
 (function() {
 
@@ -1501,9 +1503,139 @@ var TimerEvent = {
 })();
 
 //---------------------------------------------
+(function() {
+	/**
+	 * @class RoundRectMask
+	 * @description
+	 * @constructor
+	 * @param {JSON}
+	 */
+	Flex.RoundRectMask = function(config) {
+		Flex.extend(this, new Flex.BaseMask(config), config);
+		this.topLeftRadius = 0;
+		this.bottomLeftRadius = 0;
+		this.topRightRadius = 0;
+		this.bottomRightRadius = 0;
+	}
+
+	Flex.RoundRectMask.prototype = {
+		constructor : Flex.RoundRectMask,
+		start : function() {
+			trace("ok");
+			context.save();
+			context.beginPath();
+			var stageX = this.stageX;
+			var stageY = this.stageY;
+			var width = this.width;
+			var height = this.height;
+			var topLeftRadius = this.topLeftRadius;
+			var bottomLeftRadius = this.bottomLeftRaidus;
+			var topRightRadius = this.topRightRadius;
+			var bottomRightRadius = this.bottomRightRadius;
+			trace(stageX, topLeftRadius, topLeftRadius, stageY, topLeftRadius);
+			context.arcTo(stageX, topLeftRadius, topLeftRadius, stageY, topLeftRadius);
+			context.lineTo(stageX + width - topRightRadius, stageY);
+			context.arcTo(stageX + width - topRightRadius, stageY, stageX + width, stageY + topRightRadius, topRightRadius);
+			context.lineTo(stageX + width, stageY + height - bottomRightRadius);
+			context.arcTo(stageX + width, stageY + height - bottomRightRadius, stageX + width - bottomRightRadius, stageY + height, bottomRightRadius);
+			context.lineTo(stageX + bottomLeftRadius, stageY + height);
+			context.arcTo(stageX + bottomLeftRadius, stageY + height, stageX, stageY + height - bottomLeftRadius, bottomLeftRadius);
+			context.clip();
+			context.closePath();
+		},
+		end : function() {
+			context.restore();
+		}
+	}
+
+})();
 
 //---------------------------------------------
+(function(){
+	/**
+	 * @class TextField
+	 * @constructor
+	 */
+	Flex.TextField = function(config){
+		config = config || {};
+		Flex.extend(this,new Flex.DisplayObject(config),config);
+		this.textFormat = config.textFormat || null;
+		this.text = config.text || null;
+	}
+	
+	Flex.TextField.prototype = {
+		constructor:Flex.TextField,
+		render:function(){
+			var text = this.text;
+			if(text&&text.length){
+				var format = this.textFormat;
+				context.save();
+				context.font = format.weight+" "+format.size+"px "+format.font;
+				context.fillStyle = format.color;
+				context.textAlign = format.align;
+				context.textBaseline = format.baseline;
+				context.fillText(this.text,this.stageX,this.stageY);
+				context.restore();
+			}
+		}
+	}
+	
+})();
 
+//---------------------------------------------
+(function(){
+	/**
+	 * 
+	 * @class TextFormat 
+	 * @constructor
+	 * @description TextFormat类描述字符格式设置信息。
+	 */
+	Flex.TextFormat = function(config){
+		config = config || {};
+		/**
+		 * @description 字体
+		 * @field
+		 */
+		this.font = config.font||"宋体",
+		/**
+		 * @description 大小
+		 * @field
+		 */
+		this.size = config.size || 12;
+		/**
+		 * @description 颜色
+		 * @field
+		 */
+		this.color = config.color || "#333333";
+		this.url = config.url || null;
+		/**
+		 * @description是否有下划线
+		 * @field
+		 */
+		this.underline = config.underline || false;
+		/**
+		 * @description 是否是斜体
+		 * @field
+		 */
+		this.italic = config.italic || false;
+		/**
+		 * @description 字体的粗细
+		 * @field
+		 */
+		this.weight = config.weight || 400;
+		/**
+		 * @description 文本对齐方式
+		 * @field
+		 */
+		this.align = config.align || "left";
+		/**
+		 * @description 文本底线对齐方式
+		 * @field
+		 */
+		this.baseline = config.baseline || "top";
+	}
+	
+})();
 //---------------------------------------------
 
 //---------------------------------------------
