@@ -119,6 +119,11 @@
 		start : function() {
 			this.renderId = setInterval(this.appRender, 1000 / this.frameRate, this);
 			this.state = "start";
+			window.requestAnimationFrame ||
+			window.webkitRequestAnimationFrame ||
+			window.mozRequestAnimationFrame ||
+			window.oRequestAnimationFrame ||
+			window.msRequestAnimationFrame;
 		},
 		/**
 		 * 停止渲染

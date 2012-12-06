@@ -712,6 +712,11 @@
 		start : function() {
 			this.renderId = setInterval(this.appRender, 1000 / this.frameRate, this);
 			this.state = "start";
+			window.requestAnimationFrame ||
+			window.webkitRequestAnimationFrame ||
+			window.mozRequestAnimationFrame ||
+			window.oRequestAnimationFrame ||
+			window.msRequestAnimationFrame;
 		},
 		/**
 		 * 停止渲染
@@ -1551,35 +1556,107 @@ var TimerEvent = {
 })();
 
 //---------------------------------------------
-(function(){
+(function() {
 	/**
 	 * @class TextField
 	 * @constructor
 	 */
-	Flex.TextField = function(config){
+	Flex.TextField = function(config) {
 		config = config || {};
-		Flex.extend(this,new Flex.DisplayObject(config),config);
+		Flex.extend(this, new Flex.DisplayObject(config), config);
 		this.textFormat = config.textFormat || null;
-		this.text = config.text || null;
+		this._text = config.text || null;
+		this.lines = [];
+		this.cacheAsBitmap = false;
+		this._lineHeight = 24;
+		this.validateLine = false;
+		
+
+		Object.defineProperties(this, {
+			textWidth : {
+				get : function() {
+					context.save();
+					this.setContext();
+					var textWidth = context.measureText(this.text).width;
+					context.restore();
+					return textWidth;
+				}
+			},
+			text:{
+				get:function(){
+					return this._text;
+				},
+				set:function(value){
+					if(this._text!=value){
+						this._text = value;
+						context.save();
+						this.setLine();
+						context.restore();
+					}
+				}
+			},
+			lineHeight:{
+				get:function(){
+					return this._lineHeight;
+				},
+				set:function(value){
+					if(this._lineHeight!=value){
+						this._lineHeight = value;
+					}
+				}
+			}
+		});
+
 	}
-	
+
 	Flex.TextField.prototype = {
-		constructor:Flex.TextField,
-		render:function(){
+		constructor : Flex.TextField,
+		render : function() {
 			var text = this.text;
-			if(text&&text.length){
-				var format = this.textFormat;
+			if(text && text.length) {
 				context.save();
-				context.font = format.weight+" "+format.size+"px "+format.font;
-				context.fillStyle = format.color;
-				context.textAlign = format.align;
-				context.textBaseline = format.baseline;
-				context.fillText(this.text,this.stageX,this.stageY);
+				this.setContext();
+				var lines = this.lines;
+				if(!this.validateLine){
+					this.setLine();
+				}
+				var len = lines.length;
+				for(var i=0;i<len;i++){
+					context.fillText(lines[i], this.stageX, this.stageY+this.lineHeight*i);
+				}
 				context.restore();
 			}
+		},
+		setContext : function() {
+			var format = this.textFormat;
+			context.font = format.weight + " " + format.size + "px " + format.font;
+			context.fillStyle = format.color;
+			context.textAlign = format.align;
+			context.textBaseline = format.baseline;
+		},
+		setLine : function() {
+			this.setContext();
+			var text = this.text;
+			var len = text.length;
+			var currentLine = '';
+			var width = this.width;
+			var lines = this.lines;
+			if(width && width < this.textWidth) {
+				for(var i = 0; i < len; i++) {
+					if(context.measureText(currentLine).width>width){
+						var strLen = currentLine.length;
+						var lastChar = currentLine.charAt(strLen-1);
+						lines.push(currentLine.substr(0,strLen-1));
+						currentLine = lastChar;
+					}
+					currentLine += text.charAt(i);
+				}
+				lines.push(currentLine);
+			}
+			this.validateLine = true;
 		}
 	}
-	
+
 })();
 
 //---------------------------------------------
