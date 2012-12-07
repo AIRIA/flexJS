@@ -14,8 +14,8 @@
 		config = config || {};
 		this._x = config.x || 0;
 		this._y = config.y || 0;
-		this._width = NaN;
-		this._height = NaN;
+		this._width = config.width || NaN;
+		this._height =config.height ||  NaN;
 		this.measureWidth = 0;
 		this.measureHeight = 0;
 		this.stageX = 0;

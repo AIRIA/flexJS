@@ -284,8 +284,8 @@
 		config = config || {};
 		this._x = config.x || 0;
 		this._y = config.y || 0;
-		this._width = NaN;
-		this._height = NaN;
+		this._width = config.width || NaN;
+		this._height =config.height ||  NaN;
 		this.measureWidth = 0;
 		this.measureHeight = 0;
 		this.stageX = 0;
@@ -648,7 +648,7 @@
 		 * 并且会注册事件监听器
 		 */
 		init : function(canvasID) {
-			var canvas = document.getElementById(canvasID)
+			var canvas = document.getElementById(canvasID)||document.getElementsByTagName("canvas")[0];
 			this.canvas = canvas;
 			if(canvas.getContext) {
 				this.context = canvas.getContext("2d");
@@ -742,7 +742,7 @@
 		 * 
 		 */
 		render : function(displayObject) {
-			mask = displayObject.mask;
+			var mask = displayObject.mask;
 			/**
 			 * 启动遮罩
 			 */
@@ -842,8 +842,8 @@
 	 * Bitmap 类表示用于表示位图图像的显示对象
 	 * @extends Flex.DisplayObject
 	 */
-	Flex.Bitmap = function(bmd, rect) {
-		Flex.extend(this, new Flex.DisplayObject());
+	Flex.Bitmap = function(bmd, config,rect) {
+		Flex.extend(this, new Flex.DisplayObject(config),config);
 		this._bitmapData = null;
 		if(rect) {
 			this.width = rect.w;
@@ -1142,7 +1142,6 @@
 	 * 而且在设置遮罩后 遮罩的区域和owner的交叉区域将作为owner的可点击区域
 	 */
 	Flex.BaseMask = function(config){
-		trace(config);
 		config = config || {};
 		this.x = config.x || 0;
 		this.y = config.y || 0;
@@ -1306,12 +1305,13 @@ var TimerEvent = {
 	 *
 	 */
 	Flex.Group = function(config) {
+		config = config || {};
 		Flex.extend(this, new Flex.Sprite(config), config);
 		/**
 		 * @description 布局的方向 默认是垂直方向  【vertical|horizontal】
 		 * @field
 		 */
-		this._direction = "vertical";
+		this._direction = config.direction || "vertical";
 		/**
 		 * @description 垂直布局中的行间距
 		 * @field

@@ -55,7 +55,7 @@
 		 * 并且会注册事件监听器
 		 */
 		init : function(canvasID) {
-			var canvas = document.getElementById(canvasID)
+			var canvas = document.getElementById(canvasID)||document.getElementsByTagName("canvas")[0];
 			this.canvas = canvas;
 			if(canvas.getContext) {
 				this.context = canvas.getContext("2d");
@@ -149,10 +149,11 @@
 		 * 
 		 */
 		render : function(displayObject) {
+			var mask = displayObject.mask;
 			/**
 			 * 启动遮罩
 			 */
-			if(displayObject.mask){
+			if(mask){
 				mask.start();
 			}
 			

@@ -13,7 +13,7 @@
 		 * @description 布局的方向 默认是垂直方向  【vertical|horizontal】
 		 * @field
 		 */
-		this._direction = "vertical";
+		this._direction = config.direction || "vertical";
 		/**
 		 * @description 垂直布局中的行间距
 		 * @field
