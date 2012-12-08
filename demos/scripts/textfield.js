@@ -1,4 +1,8 @@
 var stage = new Flex.Stage("myCanvas");
+var bg = new Flex.Bitmap(new Flex.BitmapData("http://m5.app111.com/bizhi/big/10/056/954/10056954.jpg"));
+bg.width = stage.stageWidth;
+bg.height = stage.stageHeight;
+stage.addChild(bg);
 var textField = new Flex.TextField();
 textField.width = stage.stageWidth-40;
 textField.x = 20;

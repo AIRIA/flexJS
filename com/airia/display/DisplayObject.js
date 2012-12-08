@@ -134,6 +134,7 @@
 				}
 				return false;
 			}else if(x>this.stageX&&x<(this.stageX+this.explicitOrMeasureWidth)&&y>this.stageY&&y<(this.stageY+this.explicitOrMeasureHeight)){
+				this.touch = touch;
 				return true;
 			}
 			return false;

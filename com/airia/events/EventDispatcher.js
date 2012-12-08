@@ -53,7 +53,9 @@
 			}
 			var parent = this.parent;
 			if(parent) {
-				parent.dispatchEvent(event);
+				if(parent.isUnderPoint(this.touch)){
+					parent.dispatchEvent(event);
+				}
 			} else if(this.getRect){//getRect来判断是不是displayObject类型的对象
 				throw new Error("normal quit");
 			}

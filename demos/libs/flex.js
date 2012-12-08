@@ -110,7 +110,9 @@
 			}
 			var parent = this.parent;
 			if(parent) {
-				parent.dispatchEvent(event);
+				if(parent.isUnderPoint(this.touch)){
+					parent.dispatchEvent(event);
+				}
 			} else if(this.getRect) {
 				throw new Error("normal quit");
 			}
@@ -397,14 +399,13 @@
 			var y = touch.pageY-canvas.offsetTop;
 			var mask = this.mask;
 			if(mask){
-				// var maskRect = new Flex.Rectangle(mask.stageX,mask.stageY,mask.width,mask.height);
-				// var selfRect = this.getRect();
+				trace(mask);
 				if(x>mask.stageX&&x<(mask.stageX+mask.width)&&y>mask.stageY&&y<(mask.stageY+mask.width)){
 					return true;
 				}
 				return false;
 			}else if(x>this.stageX&&x<(this.stageX+this.explicitOrMeasureWidth)&&y>this.stageY&&y<(this.stageY+this.explicitOrMeasureHeight)){
-				trace(this);
+				this.touch = touch;
 				return true;
 			}
 			return false;
