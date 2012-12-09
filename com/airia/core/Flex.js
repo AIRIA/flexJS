@@ -3,8 +3,13 @@
  *
  */
 (function(window) {
+	/**
+	 * pivotX pivotY 用来保存当前要渲染的显示对象的注册点
+	 */
 	var Flex = window.Flex = window.$f = {
-		app:window
+		app:window,
+		pivotX:0,
+		pivotY:0
 	};
 	Flex.extend = function(sub, sup) {
 		var args = Array.prototype.slice.call(arguments);
