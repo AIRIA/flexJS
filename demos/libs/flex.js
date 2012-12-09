@@ -5,7 +5,9 @@
  */
 (function(window) {
 	var Flex = window.Flex = window.$f = {
-		app:window
+		app:window,
+		pivotX:0,
+		pivotY:0
 	};
 	Flex.extend = function(sub, sup) {
 		var args = Array.prototype.slice.call(arguments);
@@ -290,8 +292,10 @@
 		this._height =config.height ||  NaN;
 		this.measureWidth = 0;
 		this.measureHeight = 0;
-		this.stageX = 0;
-		this.stageY = 0;
+		this._stageX = 0;
+		this._stageY = 0;
+		this._pivotX = 0;
+		this._pivotY = 0;
 		this.visibal = true;
 		this.alpha = 1;
 		this.rotation = 0;
@@ -334,9 +338,59 @@
 					}
 				}
 			},
+			pivotX:{
+				get:function(){
+					return this._pivotX;
+				},
+				set:function(value){
+					if(this._pivotX!=value){
+						this._pivotX = value;
+						this.validateCoordinate();
+					}
+				}
+			},
+			pivotY:{
+				get:function(){
+					return this._pivotY;
+				},
+				set:function(value){
+					if(this._pivotY!=value){
+						this._pivotY = value;
+						this.validateCoordinate();
+					}
+				}
+			},
+			stageX:{
+				get:function(){
+					return this._stageX - Flex.pivotX;
+				},
+				set:function(value){
+					this._stageX = value;
+					// var parent = this.parent;
+					// if(parent&this._stageX!=value-parent.pivotX-this.pivotX){
+						// this._stageX = value-parent.pivotX-this.pivotX;
+					// }else{
+						// this._stageX = value - this.pivotX;
+					// }
+				}
+			},
+			stageY:{
+				get:function(){
+					return this._stageY - Flex.pivotY;
+				},
+				set:function(value){
+					this._stageY = value;
+					// var parent = this.parent;
+					// if(parent&this._stageY!=value-parent.pivotY-this.pivotY){
+						// this._stageY = value -parent.pivotY-this.pivotY ;
+					// }else{
+						// this._stageY = value - this.pivotY;
+					// }
+				}
+			},
 			width : {
 				get : function() {
-					return this._width;
+					return this.explicitOrMeasureWidth;
 				},
 				set : function(value) {
 					if(this._width != value) {
@@ -346,7 +400,7 @@
 			},
 			height : {
 				get : function() {
-					return this._height;
+					return this.explicitOrMeasureHeight;
 				},
 				set : function(value) {
 					if(this._height != value) {
@@ -360,12 +414,12 @@
 			 */
 			explicitOrMeasureWidth : {
 				get : function() {
-					return isNaN(this.width) ? this.measureWidth : this.width;
+					return isNaN(this._width) ? this.measureWidth : this._width;
 				}
 			},
 			explicitOrMeasureHeight : {
 				get : function() {
-					return isNaN(this.height) ? this.measureHeight : this.height;
+					return isNaN(this._height) ? this.measureHeight : this._height;
 				}
 			}
 		});
@@ -434,7 +488,6 @@
 		}
 	}
 })();
-
 
 //---------------------------------------------
 (function() {
@@ -741,8 +794,16 @@
 		 * 如果当前渲染对象的mask属性不为空的话  就调用mask对象的start方法来启动遮罩 
 		 * 完毕之后调用mask对象的end方法来恢复context上下文
 		 * 
+		 * 关于设置context属性的操作统一写在render方法中 在方法执行完毕之后 恢复上下文
+		 * 
 		 */
 		render : function(displayObject) {
+			context.save();
+			Flex.pivotX = displayObject.pivotX+displayObject._stageX;
+			Flex.pivotY = displayObject.pivotY+displayObject._stageY;
+			context.translate(Flex.pivotX,Flex.pivotY);
+			context.rotate((displayObject.rotation%360)/180*Math.PI);
+			context.globalAlpha = displayObject.alpha;
 			var mask = displayObject.mask;
 			/**
 			 * 启动遮罩
@@ -763,9 +824,10 @@
 					arguments.callee(children[i]);
 				}
 			}
-			if(mask){
+			if(displayObject.mask){
 				mask.end();
 			}
+			context.restore();
 		}
 	}
 
