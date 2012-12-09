@@ -1,4 +1,4 @@
-(function() {
+(function(){
 	/**
 	 * @author AIRIA
 	 * @class Flex.Timer
@@ -41,11 +41,13 @@
 		 * @description 如果计时器尚未运行，则启动计时器。
 		 */
 		start : function() {
-			this.running = true;
 			var self = this;
-			this.timerId = setTimeout(this._timeComplete,this.delay);
+			this.timerId = setTimeout(function(){
+				self._timeComplete();
+			},this.delay);
 		},
 		_timeComplete:function(){
+			this.running = true;
 			this.dispatchEvent(new Flex.Event(TimerEvent.TIMER));
 			if(this.currentCount!=this.repeatCount){
 				this.currentCount++;
@@ -64,7 +66,7 @@
 		 * @description 停止计时器。 
 		 */
 		stop : function() {
-			
+
 		}
 	}
 
