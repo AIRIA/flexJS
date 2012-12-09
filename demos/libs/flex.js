@@ -362,7 +362,11 @@
 			},
 			stageX:{
 				get:function(){
-					return this._stageX - Flex.pivotX;
+					var res = this._stageX - Flex.pivotX;
+					if(this.numChildren){
+						res -= this.pivotX;
+					}
+					return res;
 				},
 				set:function(value){
 					this._stageX = value;
@@ -376,7 +380,11 @@
 			},
 			stageY:{
 				get:function(){
-					return this._stageY - Flex.pivotY;
+					var res = this._stageY - Flex.pivotY
+					if(this.numChildren){
+						res -= this.pivotY;
+					}
+					return res;
 				},
 				set:function(value){
 					this._stageY = value;
@@ -1526,6 +1534,7 @@ var TimerEvent = {
 				for(var i = 0; i < numChildren; i++) {
 					child = children[i];
 					child.stageY = this.paddingTop + this.stageY;
+					trace(child,i,child.stageY);
 					child.y = this.paddingTop;
 					child.x = this.measureWidth;
 					child.stageX = this.stageX + child.x;
