@@ -18,8 +18,10 @@
 		this._height =config.height ||  NaN;
 		this.measureWidth = 0;
 		this.measureHeight = 0;
-		this.stageX = 0;
-		this.stageY = 0;
+		this._stageX = 0;
+		this._stageY = 0;
+		this._pivotX = 0;
+		this._pivotY = 0;
 		this.visibal = true;
 		this.alpha = 1;
 		this.rotation = 0;
@@ -62,9 +64,59 @@
 					}
 				}
 			},
+			pivotX:{
+				get:function(){
+					return this._pivotX;
+				},
+				set:function(value){
+					if(this._pivotX!=value){
+						this._pivotX = value;
+						this.validateCoordinate();
+					}
+				}
+			},
+			pivotY:{
+				get:function(){
+					return this._pivotY;
+				},
+				set:function(value){
+					if(this._pivotY!=value){
+						this._pivotY = value;
+						this.validateCoordinate();
+					}
+				}
+			},
+			stageX:{
+				get:function(){
+					return this._stageX - Flex.pivotX;
+				},
+				set:function(value){
+					this._stageX = value;
+					// var parent = this.parent;
+					// if(parent&this._stageX!=value-parent.pivotX-this.pivotX){
+						// this._stageX = value-parent.pivotX-this.pivotX;
+					// }else{
+						// this._stageX = value - this.pivotX;
+					// }
+				}
+			},
+			stageY:{
+				get:function(){
+					return this._stageY - Flex.pivotY;
+				},
+				set:function(value){
+					this._stageY = value;
+					// var parent = this.parent;
+					// if(parent&this._stageY!=value-parent.pivotY-this.pivotY){
+						// this._stageY = value -parent.pivotY-this.pivotY ;
+					// }else{
+						// this._stageY = value - this.pivotY;
+					// }
+				}
+			},
 			width : {
 				get : function() {
-					return this._width;
+					return this.explicitOrMeasureWidth;
 				},
 				set : function(value) {
 					if(this._width != value) {
@@ -74,7 +126,7 @@
 			},
 			height : {
 				get : function() {
-					return this._height;
+					return this.explicitOrMeasureHeight;
 				},
 				set : function(value) {
 					if(this._height != value) {
@@ -88,12 +140,12 @@
 			 */
 			explicitOrMeasureWidth : {
 				get : function() {
-					return isNaN(this.width) ? this.measureWidth : this.width;
+					return isNaN(this._width) ? this.measureWidth : this._width;
 				}
 			},
 			explicitOrMeasureHeight : {
 				get : function() {
-					return isNaN(this.height) ? this.measureHeight : this.height;
+					return isNaN(this._height) ? this.measureHeight : this._height;
 				}
 			}
 		});
@@ -127,8 +179,7 @@
 			var y = touch.pageY-canvas.offsetTop;
 			var mask = this.mask;
 			if(mask){
-				// var maskRect = new Flex.Rectangle(mask.stageX,mask.stageY,mask.width,mask.height);
-				// var selfRect = this.getRect();
+				trace(mask);
 				if(x>mask.stageX&&x<(mask.stageX+mask.width)&&y>mask.stageY&&y<(mask.stageY+mask.width)){
 					return true;
 				}
