@@ -147,8 +147,16 @@
 		 * 如果当前渲染对象的mask属性不为空的话  就调用mask对象的start方法来启动遮罩 
 		 * 完毕之后调用mask对象的end方法来恢复context上下文
 		 * 
+		 * 关于设置context属性的操作统一写在render方法中 在方法执行完毕之后 恢复上下文
+		 * 
 		 */
 		render : function(displayObject) {
+			context.save();
+			Flex.pivotX = displayObject.pivotX+displayObject._stageX;
+			Flex.pivotY = displayObject.pivotY+displayObject._stageY;
+			context.translate(Flex.pivotX,Flex.pivotY);
+			context.rotate((displayObject.rotation%360)/180*Math.PI);
+			context.globalAlpha = displayObject.alpha;
 			var mask = displayObject.mask;
 			/**
 			 * 启动遮罩
@@ -172,6 +180,7 @@
 			if(displayObject.mask){
 				mask.end();
 			}
+			context.restore();
 		}
 	}
 
