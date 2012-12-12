@@ -167,8 +167,8 @@
 		validateCoordinate:function(){
 			var parent = this.parent;
 			if(parent) {
-				this.stageX = this.x + parent.stageX;
-				this.stageY = this.y + parent.stageY;
+				this.stageX = this.x + parent._stageX;
+				this.stageY = this.y + parent._stageY;
 				if(this.graphics) {
 					this.graphics.validateRender();
 				}
