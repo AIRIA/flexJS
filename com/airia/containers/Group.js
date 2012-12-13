@@ -145,10 +145,9 @@
 			if(this.direction == "vertical") {
 				for(var i = 0; i < numChildren; i++) {
 					child = children[i];
-					child.stageX = this.paddingLeft + this.stageX;
+					child.stageX = this.paddingLeft;
 					child.x = this.paddingLeft;
-					child.y = this.measureHeight;
-					child.stageY = this.stageY + child.y;
+					child.stageY = child.y = this.measureHeight;
 					if(i == 0) {
 						child.y += this.paddingTop;
 					} else {
@@ -164,10 +163,9 @@
 			} else {
 				for(var i = 0; i < numChildren; i++) {
 					child = children[i];
-					child.stageY = this.paddingTop + this.stageY;
+					child.stageY = this.paddingTop;
 					child.y = this.paddingTop;
-					child.x = this.measureWidth;
-					child.stageX = this.stageX + child.x;
+					child.stageX = child.x = this.measureWidth;
 					if(i == 0) {
 						child.x += this.paddingLeft;
 					} else {
