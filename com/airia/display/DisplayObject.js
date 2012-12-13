@@ -88,7 +88,7 @@
 			},
 			stageX:{
 				get:function(){
-					var res = this._stageX - Flex.pivotX;
+					var res = this._stageX - Flex.pivotX-this.parent.pivotX;
 					if(this.numChildren){
 						res -= this.pivotX;
 					}
@@ -106,7 +106,7 @@
 			},
 			stageY:{
 				get:function(){
-					var res = this._stageY - Flex.pivotY
+					var res = this._stageY - Flex.pivotY-this.parent.pivotY;
 					if(this.numChildren){
 						res -= this.pivotY;
 					}
