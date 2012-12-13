@@ -5,9 +5,7 @@
  */
 (function(window) {
 	var Flex = window.Flex = window.$f = {
-		app:window,
-		pivotX:0,
-		pivotY:0
+		app:window
 	};
 	Flex.extend = function(sub, sup) {
 		var args = Array.prototype.slice.call(arguments);
@@ -323,7 +321,6 @@
 				set : function(value) {
 					if(this._x != value) {
 						this._x = value;
-						trace(this,"setX");
 						this.validateCoordinate();
 					}
 				}
@@ -335,7 +332,6 @@
 				set : function(value) {
 					if(this._y != value) {
 						this._y = value;
-						trace(this,"setY");
 						this.validateCoordinate();
 					}
 				}
@@ -347,8 +343,6 @@
 				set:function(value){
 					if(this._pivotX!=value){
 						this._pivotX = value;
-						trace(this,"setPX");
-						this.validateCoordinate();
 					}
 				}
 			},
@@ -359,45 +353,24 @@
 				set:function(value){
 					if(this._pivotY!=value){
 						this._pivotY = value;
-						trace(this,"setPY");
 						this.validateCoordinate();
 					}
 				}
 			},
 			stageX:{
 				get:function(){
-					var res = this._stageX - Flex.pivotX - this.parent.pivotX;
-					if(this.numChildren){
-						res -= this.pivotX;
-					}
-					return res;
+					return this._stageX;
 				},
 				set:function(value){
 					this._stageX = value;
-					// var parent = this.parent;
-					// if(parent&this._stageX!=value-parent.pivotX-this.pivotX){
-						// this._stageX = value-parent.pivotX-this.pivotX;
-					// }else{
-						// this._stageX = value - this.pivotX;
-					// }
 				}
 			},
 			stageY:{
 				get:function(){
-					var res = this._stageY - Flex.pivotY - this.parent.pivotX;
-					if(this.numChildren){
-						res -= this.pivotY;
-					}
-					return res;
+					return this._stageY;
 				},
 				set:function(value){
 					this._stageY = value;
-					// var parent = this.parent;
-					// if(parent&this._stageY!=value-parent.pivotY-this.pivotY){
-						// this._stageY = value -parent.pivotY-this.pivotY ;
-					// }else{
-						// this._stageY = value - this.pivotY;
-					// }
 				}
 			},
 			width : {
@@ -445,13 +418,12 @@
 		validateCoordinate:function(){
 			var parent = this.parent;
 			if(parent) {
-				this.stageX = this.x + parent._stageX;
-				this.stageY = this.y + parent._stageY;
+				this.stageX = this.x + parent.stageX;
+				this.stageY = this.y + parent.stageY;
 				if(this.graphics) {
 					this.graphics.validateRender();
 				}
 				if(this.updateDisplayList){
-					trace(this,"validateCoordinate",this.stageY,Flex.pivotY);
 					this.updateDisplayList();
 				}
 			}
@@ -462,9 +434,6 @@
 		 * @param {Event} 触发的事件对象
 		 */
 		isUnderPoint:function(touch){
-			if(!touch){
-				return false;
-			}
 			var x = touch.pageX-canvas.offsetLeft;
 			var y = touch.pageY-canvas.offsetTop;
 			var mask = this.mask;
@@ -531,7 +500,6 @@
 			if(children.indexOf(child) == -1) {
 				children.push(child);
 				child.parent = this;
-				trace(this,"addChild");
 				child.validateCoordinate();
 			} else {
 				trace(child + '已经存在于' + this + '的显示列表中了', Log.ERROR);
@@ -816,15 +784,10 @@
 		 */
 		render : function(displayObject) {
 			context.save();
-			if(displayObject.pivotX){
-				Flex.pivotX = displayObject.pivotX+displayObject._stageX;
-			}
-			if(displayObject.pivotY){
-				Flex.pivotY = displayObject.pivotY+displayObject._stageY;
-			}
-			context.translate(Flex.pivotX,Flex.pivotY);
-			context.rotate((displayObject.rotation%360)/180*Math.PI);
 			var mask = displayObject.mask;
+			context.save();
+			context.rotate(displayObject.rotation%360/180*Math.PI);
+			context.globalAlpha = displayObject.alpha;
 			/**
 			 * 启动遮罩
 			 */
@@ -834,10 +797,7 @@
 			
 			if(!( displayObject instanceof Flex.Stage)) {
 				if(displayObject.render) {
-					context.globalAlpha = displayObject.alpha*displayObject.parent.alpha;
-					displayObject.dispatchEvent(new Flex.Event(Event.ENTER_FRAME));
 					displayObject.render();
-					displayObject.dispatchEvent(new Flex.Event(Event.EXIT_FRAME));
 				}
 			}
 			var numChildren = displayObject.numChildren;
@@ -851,8 +811,6 @@
 				mask.end();
 			}
 			context.restore();
-			Flex.pivotX = 0;
-			Flex.pivotY = 0;
 		}
 	}
 
@@ -1305,10 +1263,6 @@ var TimerEvent = {
 	TIMER:'timer',
 	TIMER_COMPLETE:'timer_complete'
 };
-var Event = {
-	ENTER_FRAME:'enter_frame',
-	EXIT_FRAME:'exit_frame'
-};
 //---------------------------------------------
 (function(){
 	/**
@@ -1435,7 +1389,6 @@ var Event = {
 				set : function(value) {
 					if(this._direction != value) {
 						this._direction = value;
-						trace("setDirection");
 						this.updateDisplayList();
 					}
 				}
@@ -1447,7 +1400,6 @@ var Event = {
 				set : function(value) {
 					if(this._verticalGap != value) {
 						this._verticalGap = value;
-						trace("setGap");
 						this.updateDisplayList();
 					}
 				}
@@ -1459,7 +1411,6 @@ var Event = {
 				set : function(value) {
 					if(this._horizontalGap != value) {
 						this._horizontalGap = value;
-						trace("setGap");
 						this.updateDisplayList();
 					}
 				}
@@ -1471,7 +1422,6 @@ var Event = {
 				set : function(value) {
 					if(this._paddingLeft != value) {
 						this._paddingLeft = value;
-						trace("setPadding");
 						this.updateDisplayList();
 					}
 				}
@@ -1483,7 +1433,6 @@ var Event = {
 				set : function(value) {
 					if(this._paddingRight != value) {
 						this._paddingRight = value;
-						trace("setPadding");
 						this.updateDispalyList();
 					}
 				}
@@ -1495,7 +1444,6 @@ var Event = {
 				set : function(value) {
 					if(this._paddingTop != value) {
 						this._paddingTop = value;
-						trace("setPadding");
 						this.updateDisplayList();
 					}
 				}
@@ -1507,7 +1455,6 @@ var Event = {
 				set : function(value) {
 					if(this._paddingBottom != vlaue) {
 						this._paddingBottom = value;
-						trace("setPadding");
 						this.updateDisplayList();
 					}
 				}
@@ -1523,6 +1470,7 @@ var Event = {
 		 */
 		addChild : function(child) {
 			this.superClass.addChild.apply(this, [child]);
+			this.updateDisplayList();
 		},
 		/**
 		 * 进行布局
@@ -1538,10 +1486,10 @@ var Event = {
 			if(this.direction == "vertical") {
 				for(var i = 0; i < numChildren; i++) {
 					child = children[i];
-					child.stageX = this.paddingLeft;
+					child.stageX = this.paddingLeft + this.stageX;
 					child.x = this.paddingLeft;
 					child.y = this.measureHeight;
-					child.stageY = this.measureHeight;
+					child.stageY = this.stageY + child.y;
 					if(i == 0) {
 						child.y += this.paddingTop;
 					} else {
@@ -1557,11 +1505,11 @@ var Event = {
 			} else {
 				for(var i = 0; i < numChildren; i++) {
 					child = children[i];
-					child.stageY = this.paddingTop;
+					child.stageY = this.paddingTop + this.stageY;
+					trace(child,i,child.stageY);
 					child.y = this.paddingTop;
 					child.x = this.measureWidth;
-					child.stageX = this.measureWidth;
-					trace(i,child,child.stageY,child._stageY,this.stageY);
+					child.stageX = this.stageX + child.x;
 					if(i == 0) {
 						child.x += this.paddingLeft;
 					} else {

@@ -152,11 +152,10 @@
 		 */
 		render : function(displayObject) {
 			context.save();
-			Flex.pivotX = displayObject.pivotX+displayObject._stageX;
-			Flex.pivotY = displayObject.pivotY+displayObject._stageY;
-			context.translate(Flex.pivotX,Flex.pivotY);
-			context.rotate((displayObject.rotation%360)/180*Math.PI);
 			var mask = displayObject.mask;
+			context.save();
+			context.rotate(displayObject.rotation%360/180*Math.PI);
+			context.globalAlpha = displayObject.alpha;
 			/**
 			 * 启动遮罩
 			 */
@@ -166,10 +165,7 @@
 			
 			if(!( displayObject instanceof Flex.Stage)) {
 				if(displayObject.render) {
-					context.globalAlpha = displayObject.alpha*displayObject.parent.alpha;
-					displayObject.dispatchEvent(new Flex.Event(Event.ENTER_FRAME));
 					displayObject.render();
-					displayObject.dispatchEvent(new Flex.Event(Event.EXIT_FRAME));
 				}
 			}
 			var numChildren = displayObject.numChildren;

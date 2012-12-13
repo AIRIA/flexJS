@@ -71,7 +71,6 @@
 				set:function(value){
 					if(this._pivotX!=value){
 						this._pivotX = value;
-						this.validateCoordinate();
 					}
 				}
 			},
@@ -88,38 +87,18 @@
 			},
 			stageX:{
 				get:function(){
-					var res = this._stageX - Flex.pivotX-this.parent.pivotX;
-					if(this.numChildren){
-						res -= this.pivotX;
-					}
-					return res;
+					return this._stageX;
 				},
 				set:function(value){
 					this._stageX = value;
-					// var parent = this.parent;
-					// if(parent&this._stageX!=value-parent.pivotX-this.pivotX){
-						// this._stageX = value-parent.pivotX-this.pivotX;
-					// }else{
-						// this._stageX = value - this.pivotX;
-					// }
 				}
 			},
 			stageY:{
 				get:function(){
-					var res = this._stageY - Flex.pivotY-this.parent.pivotY;
-					if(this.numChildren){
-						res -= this.pivotY;
-					}
-					return res;
+					return this._stageY;
 				},
 				set:function(value){
 					this._stageY = value;
-					// var parent = this.parent;
-					// if(parent&this._stageY!=value-parent.pivotY-this.pivotY){
-						// this._stageY = value -parent.pivotY-this.pivotY ;
-					// }else{
-						// this._stageY = value - this.pivotY;
-					// }
 				}
 			},
 			width : {
@@ -167,8 +146,8 @@
 		validateCoordinate:function(){
 			var parent = this.parent;
 			if(parent) {
-				this.stageX = this.x + parent._stageX;
-				this.stageY = this.y + parent._stageY;
+				this.stageX = this.x + parent.stageX;
+				this.stageY = this.y + parent.stageY;
 				if(this.graphics) {
 					this.graphics.validateRender();
 				}
